@@ -44,6 +44,8 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
+    print(data["board"])
+    print()
     print("MOVE:", json.dumps(data))
 
     # Choose a random direction to move in
