@@ -8,7 +8,7 @@ from bottle import HTTPResponse
 
 @bottle.route("/")
 def index():
-    return "Your Battlesnake is alive!"
+    return "Your Battlesnake is alive! or is it?"
 
 
 @bottle.post("/ping")
@@ -28,7 +28,7 @@ def start():
     data = bottle.request.json
     print("START:", json.dumps(data))
 
-    response = {"color": "#00FF00", "headType": "regular", "tailType": "regular"}
+    response = {"color": "#00FF7F", "headType": "bendr", "tailType": "round-bum"}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
@@ -54,7 +54,7 @@ def move():
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
 
-    response = {"move": move, "shout": shout}
+    response = {"move": "right", "shout": shout}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
