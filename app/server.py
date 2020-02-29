@@ -61,7 +61,7 @@ def move():
     shout = "I am a python snake!"
 
     #response = {"move": "right", "shout": shout}
-    response = Logic.next_move(data)
+    #response = Logic.next_move(data)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
