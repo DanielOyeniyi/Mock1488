@@ -1,6 +1,7 @@
 import json
 import os
 import random
+import Logic
 
 import bottle
 from bottle import HTTPResponse
@@ -19,6 +20,8 @@ def ping():
     return HTTPResponse(status=200)
 
 
+
+# only works for one game at a time
 @bottle.post("/start")
 def start():
     """
@@ -44,10 +47,11 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    print(data["board"])
-    print()
-    print("MOVE:", json.dumps(data))
-
+    print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
+    
+    #decision(data["board"])
+    
+    # try and remember past moves (with size being snake length)
     # Choose a random direction to move in
     directions = ["up", "down", "left", "right"]
     move = random.choice(directions)
@@ -56,12 +60,20 @@ def move():
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
 
-    response = {"move": "right", "shout": shout}
+    #response = {"move": "right", "shout": shout}
+    response = Logic.next_move(data)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
         body=json.dumps(response),
     )
+    # create seperate files classes
+    # (0,0) is top left
+    
+# (dict) -> string
+# takes a dict representing the board data
+# then returns a move response
+#def dicision(dict)
 
 
 @bottle.post("/end")
