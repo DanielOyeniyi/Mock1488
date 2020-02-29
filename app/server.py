@@ -46,7 +46,7 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    print("MOVE:", json.dumps()) # just raw text... move is irrelavent
+    print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
     
     # try and remember past moves (with size being snake length)
     shout = "I am a python snake!"
