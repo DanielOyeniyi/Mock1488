@@ -188,7 +188,6 @@ def good_direction(lod, bad):
     for direction in lod: 
         if (direction != bad):
             good_list.append(direction)
-    print(good_list)
     return random.choice(good_list)
 
 
