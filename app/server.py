@@ -59,6 +59,7 @@ def move():
     response = {"move": "right", "shout": shout}
     print()
     response = next_move(data)
+    print(response)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
