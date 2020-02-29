@@ -59,7 +59,6 @@ def move():
     response = {"move": "right", "shout": shout}
     print()
     response = next_move(data)
-    print(response)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
@@ -73,21 +72,16 @@ def move():
 # then returns a move response
 #def dicision(dict)
 
-# (dict) -> str
+# dict -> string
 # takes a dict containg board info and produces a direction
-# turn is a int
-# you is a dict
-# board is a dict
-# body is a list of dicts
-# head is a dict representing x,y coordinates
 def next_move(data):
-    turn = data["turn"]
-    you = data["you"]
-    board = data["board"]
-    body = you["body"]
-    head = body[0] 
-    range = board["height"]
-    range -= 1 # we start counting at 0
+    turn = data["turn"]            # turn is a int representign the turn in game
+    you = data["you"]              # you is a dict representing your snakes data
+    board = data["board"]          # board is a dict representing the game board info
+    body = you["body"]             # body is a list of dicts representing your snakes location
+    head = body[0]                 # head is a dict representing your snakes head
+    range = board["height"]        # range is the dimention number e.g. 14 by 14
+    range -= 1                     # we start counting at 0 because we are coders
     
     # directions = ["up", "down", "left", "right"]
     # bad_snake(directions, body)
@@ -95,7 +89,8 @@ def next_move(data):
     # uhhh... the snake will colide into itself depending on where it's body is
     # are a bunch or if else statements all we need? or can we implement recursion
     # mabey blocks of moves to fill a small 4 by 4 grid, but what about other snakes? 
-    # or if your body size is bigger than 3, initial size is 3
+    # initial size is 3
+    # is a stack a good use here? 
     
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
@@ -140,16 +135,61 @@ def next_move(data):
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
     
     
+# list, dict -> string 
+# takes a list of possible directions and a dict 
+# representing your snakes body locations and produce a move
+# that won't make the snake eat itself
+def bad_direction(lod, body): 
+    # first focus on a 3 body snake
+    # might have to individual cases depending on the contents of the 
+    # lod, but is it posible to remove the bad directions from the dict? 
+    # yes loop through the list, and if it comtains bad directions then don't 
+    # append it to you good directions list
+    # first deal with the case where the snakes body(block after the head)
+    # then if it is a perfect line
+    # replicate if it is more than 3
+    # you start with only 1 head
+    
+    head = body[0]
+    try:
+        after_head = body[1]
+    except IndexError:  
+        return random.choice(lod)
+        
+    # please just use the head as it is easier to understand    
+        
+    # if body is to the right of head and on the same line
+    if (head["x"] + 1 == after_head["x"] and head["y"] == after_head["y"]):
+        return good_direction(lod, "right")
+        
+    # if body is to the left of the head and on the same line
+    elif (head["x"] - 1 == after_head["x"] and head["y"] == after_head["y"]):
+        return good_direction(lod, "left")
+        
+    # if body is below the head and on the same line
+    elif (head["y"] + 1 == after_head["y"] and head["x"] == after_head["x"]):
+        return good_direction(lod, "down")
+        
+    # if body is above the head and on the same line
+    elif (head["y"] - 1 == after_head["y"] and head["x"] == after_head["x"]): 
+        return good_direction(lod, "up")
+        
+    else:
+        return random.choice(lod)
 
-
-
-
-
-
+# list, string -> string 
+# takes a list of directions and a bad direction
+# then returns a list of only good directions
+def good_direction(lod, bad): 
+    good_list = []
+    for direction in lod: 
+        if (direction != bad):
+            good_list.append(direction)
+    print(good_list)
+    return random.choice(good_list)
 
 
 @bottle.post("/end")
