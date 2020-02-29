@@ -1,7 +1,7 @@
 import json
 import os
 import random
-#import Logic
+import Logic
 
 import bottle
 from bottle import HTTPResponse
@@ -61,11 +61,11 @@ def move():
     shout = "I am a python snake!"
 
     #response = {"move": "right", "shout": shout}
-    #response = Logic.next_move(data)
+    response = Logic.next_move(data)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
-        body=json.dumps("up"),
+        body=json.dumps(response),
     )
     # create seperate files classes
     # (0,0) is top left

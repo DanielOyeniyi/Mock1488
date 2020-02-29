@@ -81,3 +81,8 @@ def next_move(data):
     # size = body.length()
     # print(size)
 
+
+
+class Logic: 
+    def __init__(self, huh):
+        this.huh = huh
