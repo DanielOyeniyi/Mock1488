@@ -1,7 +1,7 @@
 import json
 import os
 import random
-import Logic.py
+import Logic
 
 import bottle
 from bottle import HTTPResponse
