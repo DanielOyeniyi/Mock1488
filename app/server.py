@@ -46,7 +46,7 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
+    #print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
     
     #decision(data["board"])
     
@@ -59,8 +59,10 @@ def move():
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
 
-    #response = {"move": "right", "shout": shout}
+    response = {"move": "right", "shout": shout}
+    print()
     response = next_move(data)
+    print(response)
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
