@@ -28,7 +28,7 @@ def start():
     Your response will control how your snake is displayed on the board.
     """
     data = bottle.request.json
-    #print("START:", json.dumps(data))
+    print("START:", json.dumps(data))
 
     response = {"color": "#00FF7F", "headType": "bendr", "tailType": "round-bum"}
     return HTTPResponse(
