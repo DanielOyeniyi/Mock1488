@@ -74,8 +74,8 @@ def next_move(data):
     board = data["board"]          # board is a dict representing the game board info
     body = you["body"]             # body is a list of dicts representing your snakes location
     head = body[0]                 # head is a dict representing your snakes head
-    range = board["height"]        # range is the dimention number e.g. 14 by 14
-    range -= 1                     # we start counting at 0 because we are coders
+    max = board["height"]          # max is the dimention number e.g. 14 by 14
+    max -= 1                       # we start counting at 0 because we are coders
     
     # directions = ["up", "down", "left", "right"]
     # bad_snake(directions, body)
@@ -85,43 +85,44 @@ def next_move(data):
     # mabey blocks of moves to fill a small 4 by 4 grid, but what about other snakes? 
     # initial size is 3
     # is a stack a good use here? 
+    # if you have a head on head collision the smaller snake dies
     
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
         
-    elif (head["x"] == range and head["y"] == 0):      # top right corner 
+    elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
         
-    elif (head["x"] == range and head["y"] == range):  # bottom right corner 
+    elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
         
-    elif (head["x"] == 0 and head["y"] == range):      # bottom left corner
+    elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
 
-    elif (head["x"] == range):                         # right wall 
+    elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
         
-    elif (head["y"] == range):                         # bottom wall
+    elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return bad_direction(directions, body)
+        return body_sensor(directions, body)
     
     
 # list, dict -> string 
@@ -143,9 +144,7 @@ def bad_direction(lod, body):
     try:
         after_head = body[1]
     except IndexError:  
-        return random.choice(lod)
-        
-    # please just use the head as it is easier to understand    
+        return random.choice(lod)    
         
     # if body is to the right of head and on the same line
     if (head["x"] + 1 == after_head["x"] and head["y"] == after_head["y"]):
@@ -166,15 +165,49 @@ def bad_direction(lod, body):
     else:
         return random.choice(lod)
 
+
+
+# should sense the possible options and pick the ones
+# that won't result in instant death
+def body_sensor(lod, body):
+    head = body[0]
+    headx = head["x"]
+    heady = head["y"]
+    option1 = {"x": headx+1, "y": heady}    # right block
+    option2 = {"x": headx-1, "y": heady}    # left block   
+    option3 = {"x": headx, "y": heady+1}    # down block
+    option4 = {"x": headx, "y": heady-1}    # up block 
+
+    if (option1 in body and "right" in lod): 
+        lod.remove("right")
+        
+    if (option2 in body and "left" in lod):
+        lod.remove("left")
+        
+    if (option3 in body and "down" in lod):
+        lod.remove("down")
+        
+    if (option4 in body and "up" in lod):
+        lod.remove("up")
+        
+    if (len(lod) != 0):
+        return random.choice(lod)
+    else: 
+        print("we are surrounded....")
+        return "up"
+    
+    
+    
+    
+
+
 # list, string -> string 
 # takes a list of directions and a bad direction
 # then returns a list of only good directions
 def good_direction(lod, bad): 
-    good_list = []
-    for direction in lod: 
-        if (direction != bad):
-            good_list.append(direction)
-    return random.choice(good_list)
+    lod.remove(bad)
+    good_list = lod
+    return good_list 
 
 
 @bottle.post("/end")
