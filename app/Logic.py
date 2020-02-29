@@ -33,6 +33,7 @@ def next_move(data):
     elif (head["x"] == range and head["y"] == 0):      # top right corner 
         directions = ["down", "left"]
         move = random.choice(directions)
+        return move
         
     elif (head["x"] == range and head["y"] == range):  # bottom right corner 
         directions = ["up", "left"]

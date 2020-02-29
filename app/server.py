@@ -65,8 +65,7 @@ def move():
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
-        #body=json.dumps(response),
-        body=json.dumps("left"),
+        body=json.dumps(response),
     )
     # create seperate files classes
     # (0,0) is top left
