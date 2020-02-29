@@ -1,7 +1,7 @@
 import json
 import os
 import random
-import Logic
+#import Logic
 
 import bottle
 from bottle import HTTPResponse
@@ -47,7 +47,7 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    print("MOVE:", json.dumps(data["turn"])) # just raw text... move is irrelavent
+    print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
     
     #decision(data["board"])
     
