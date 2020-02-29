@@ -48,10 +48,7 @@ def move():
     data = bottle.request.json
     #print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
     
-    #decision(data["board"])
-    
     # try and remember past moves (with size being snake length)
-    # Choose a random direction to move in
     directions = ["up", "down", "left", "right"]
     move = random.choice(directions)
 
@@ -98,7 +95,7 @@ def next_move(data):
     # uhhh... the snake will colide into itself depending on where it's body is
     # are a bunch or if else statements all we need? or can we implement recursion
     # mabey blocks of moves to fill a small 4 by 4 grid, but what about other snakes? 
-    # or if your body size is bigger than 3
+    # or if your body size is bigger than 3, initial size is 3
     
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
@@ -142,7 +139,8 @@ def next_move(data):
         return move
 
     else:
-        directions = ["up", "down", "left", "right"]   # middle of board
+        directions = ["down", "left", "right"] 
+        #directions = ["up", "down", "left", "right"]   # middle of board
         move = random.choice(directions)
         return move
     
