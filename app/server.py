@@ -28,7 +28,7 @@ def start():
     Your response will control how your snake is displayed on the board.
     """
     data = bottle.request.json
-    print("START:", json.dumps(data))
+    #print("START:", json.dumps(data))
 
     response = {"color": "#00FF7F", "headType": "bendr", "tailType": "round-bum"}
     return HTTPResponse(
@@ -46,7 +46,7 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    #print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
+    print("MOVE:", json.dumps(data["turn"])) # just raw text... move is irrelavent
     
     # try and remember past moves (with size being snake length)
     directions = ["up", "down", "left", "right"]
@@ -139,8 +139,7 @@ def next_move(data):
         return move
 
     else:
-        directions = ["down", "left", "right"] 
-        #directions = ["up", "down", "left", "right"]   # middle of board
+        directions = ["up", "down", "left", "right"]   # middle of board
         move = random.choice(directions)
         return move
     
