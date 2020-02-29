@@ -55,11 +55,9 @@ def move():
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
-
-    response = {"move": "right", "shout": shout}
-    print()
-    response = next_move(data)
-    print(response)
+    
+    move = next_move(data)
+    response = {"move": move, "shout": shout}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
