@@ -89,43 +89,35 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
         
     elif (head["x"] == range and head["y"] == 0):      # top right corner 
         directions = ["down", "left"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
         
     elif (head["x"] == range and head["y"] == range):  # bottom right corner 
         directions = ["up", "left"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
         
     elif (head["x"] == 0 and head["y"] == range):      # bottom left corner
         directions = ["up", "right"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
 
     elif (head["x"] == range):                         # right wall 
         directions = ["up", "down","left"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
         
     elif (head["y"] == range):                         # bottom wall
         directions = ["up", "left","right"]
-        move = random.choice(directions)
-        return move
+        return bad_direction(directions, body)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
