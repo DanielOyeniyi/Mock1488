@@ -231,22 +231,24 @@ def advanced_body_sensor(block, body, snakes, max):  # can we make it check even
     count = 0                                 # count of available moves                    
     
     # what about the case where blockx or blocky is -1 or 11?
-    
-    if (right_block not in body):
-        count += 1       
-    if (left_block not in body):
-        count += 1        
-    if (down_block not in body):
-        count += 1        
-    if (up_block not in body): 
-        count += 1
-    
+    if (len(snakes) == 1):
+        snake1 = snakes[0]
+        snake1_body = snake1["body"]
+        
+        if (right_block not in body and right_block not in snake1_body):
+            count += 1       
+        if (left_block not in body and left_block not in snake1_body):
+            count += 1        
+        if (down_block not in body and down_block not in snake1_body):
+            count += 1        
+        if (up_block not in body and up_block not in snake1_body): 
+            count += 1
+        
     if (blockx == 0 or blockx == max):
         count -= 1
     if (blocky == 0 or blockx == max):
         count -= 1
     
-    print(count)
     return count
     
 # string, dict, dict, dict, dict -> dict
