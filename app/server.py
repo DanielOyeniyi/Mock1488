@@ -182,6 +182,7 @@ def body_sensor(lod, body, snakes, max):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
+    ownsize = len(body)
     tails = make_tails(snakes)
     heads = make_heads(snakes)
     sizes = make_sizes(snakes)
@@ -227,9 +228,9 @@ def body_sensor(lod, body, snakes, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, max)
-            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max)
+            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 del lod[2]
@@ -269,7 +270,7 @@ def body_sensor(lod, body, snakes, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
@@ -277,7 +278,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
     down_block = {"x": blockx, "y": blocky+1}
     up_block = {"x": blockx, "y": blocky-1} 
     count = 0                                 # count of available blocks                  
- 
+
     # keep track of sizes, if size is smaller than you attack the head
 
     if (right_block not in snakes):
@@ -288,7 +289,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
         count += 1        
     if (up_block not in snakes): 
         count += 1
-    
+
     for tail in tails:
         if (right_block == tail):
             count += 1
@@ -298,10 +299,10 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
             count += 1
         if (up_block == tail):
             count += 1
-    
+
     counter = 0
     for head in heads:                  # place more danger in the heads
-        if (sizes[0] > sizes[counter]):           
+        if (ownsize > sizes[counter]):           
             if (right_block == head):
                 count += 2
             if (left_block == head):
@@ -310,6 +311,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
                 count += 2
             if (up_block == head):
                 count += 2
+                
         else:
             if (right_block == head):
                 count -= 2
@@ -320,13 +322,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
             if (up_block == head):
                 count -= 2
         counter += 1
-    
+
 
     if (blockx == 0 or blockx == max):
         count -= 1
     if (blocky == 0 or blockx == max):
         count -= 1
-    
+
     return count
     
     
