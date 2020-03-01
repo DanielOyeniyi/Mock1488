@@ -74,50 +74,49 @@ def next_move(data):
     health = you["health"]                   # health of the snake
     head = body[0]                           # head is a dict representing your snakes head
     max = board["height"]                    # max is the dimention number e.g. 14 by 14
-    max -= 1                                 # we start counting at 0 because we are coders
  
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
     
 
 # list, list -> string
 # takes a list of possible directions and 
 # picks a direction that will go towards food
-def eat_food(lod, food, body, health):
+def eat_food(lod, food, body):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
@@ -339,11 +338,14 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
         if (up_block == item):
             count += 3
 
-    if (blockx == 0 or blockx == max):
+    if (blockx == -1 or blockx == max):
         count -= 1
-    if (blocky == 0 or blocky == max):
+    if (blocky == -1 or blocky == max):
         count -= 1
-        
+       
+    print(food)
+    print(down_block)
+    print(count)
     return count
     
     
