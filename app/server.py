@@ -134,23 +134,21 @@ def eat_food(lod, food, body):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
-    food1 = food[0]
-    food1x = food1["x"]
-    food1y = food1["y"]
-    
-    if ("right" in lod): 
-        if (headx < food1x): 
-            return "right"
-    if ("left" in lod):
-        if (headx > food1x):
-            return "left"
-    if ("down" in lod):
-        if (heady < food1y):
-            return "down"
-    if ("up" in lod):   
-        if (heady > food1y):
-            return "up"
-    if (lod != 0):
+
+    for item in food:
+        if (headx == item["x"]):
+            if (heady < item["y"] and "down" in lod):
+                return "down"
+            if (heady > item["y"] and "up" in lod):
+                return "up"
+                
+        if (heady == item["y"]):
+            if (headx < item["x"] and "right" in lod):
+                return "right"
+            if (headx > item["x"] and "left" in lod):
+                return "left"
+            
+    if (len(lod) != 0):
         return random.choice(lod)
     else: 
         print("Uh oh...")
