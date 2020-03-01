@@ -122,7 +122,7 @@ def eat_food(lod, food, body, health):
     headx = head["x"]
     heady = head["y"]
     
-    if (health <= 20):
+    if (health < 101):
         for item in food:
             if (headx == item["x"]):
                 if (heady < item["y"] and "down" in lod):
