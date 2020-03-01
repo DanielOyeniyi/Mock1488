@@ -158,6 +158,13 @@ def make_tails(snakes):
         body = snake["body"]
         tails.append(body[-1])
     return tails
+    
+def make_heads(snakes): 
+    heads = []
+    for snake in snakes: 
+        body = snake["body"]
+        heads.append(body[0])
+    return heads
 
 
 # list, list, int -> string
@@ -168,6 +175,7 @@ def body_sensor(lod, body, snakes, max):
     headx = head["x"]
     heady = head["y"]
     tails = make_tails(snakes)
+    heads = make_heads(snakes)
     snakes = make_occupied(snakes)
     right_block = {"x": headx+1, "y": heady}    
     left_block = {"x": headx-1, "y": heady}      
@@ -260,8 +268,7 @@ def advanced_body_sensor(block, snakes, tails, max):  # can we make it check eve
     down_block = {"x": blockx, "y": blocky+1}
     up_block = {"x": blockx, "y": blocky-1} 
     count = 0                                 # count of available blocks                  
-    
-    # how to make it ignore the tail of other snakes? 
+ 
     # what about the head? diagonal?
 
     if (right_block not in snakes):
@@ -282,6 +289,16 @@ def advanced_body_sensor(block, snakes, tails, max):  # can we make it check eve
             count += 1
         if (up_block == tail):
             count += 1
+            
+    for head in heads:                  # place more danger in the heads
+        if (right_block == head):
+            count -= 1
+        if (left_block == head):
+            count -= 1
+        if (down_block == head):
+            count -= 1
+        if (up_block == head):
+            count -= 1
     
 
     if (blockx == 0 or blockx == max):
