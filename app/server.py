@@ -301,7 +301,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we mak
     
     counter = 0
     for head in heads:                  # place more danger in the heads
-        if (sizes[0] > sizes[0]):           
+        if (sizes[0] > sizes[counter]):           
             if (right_block == head):
                 count += 2
             if (left_block == head):
