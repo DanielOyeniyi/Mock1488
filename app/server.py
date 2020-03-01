@@ -201,8 +201,8 @@ def body_sensor(lod, body, snakes, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, max)
             
             if (choice1 > choice2):
                 del lod[1]
@@ -218,9 +218,9 @@ def body_sensor(lod, body, snakes, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, max)
-            choice3 = advanced_body_sensor(block3, snakes, tails, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads,max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, max)
+            choice3 = advanced_body_sensor(block3, snakes, tails, heads, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 del lod[2]
@@ -260,7 +260,7 @@ def body_sensor(lod, body, snakes, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, snakes, tails, max):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, tails, heads, max):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
