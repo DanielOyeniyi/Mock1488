@@ -304,17 +304,17 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
         if (up_block == tail):
             count += 1
 
-
+    counter = 0
     for head in heads:                  # look to kill if bigger, run away if smaller
-        if (ownsize > len(head)):           
+        if (ownsize > sizes[counter]):           
             if (right_block == head):
-                count += 4
+                count += 2
             if (left_block == head):
-                count += 4
+                count += 2
             if (down_block == head):
-                count += 4
+                count += 2
             if (up_block == head):
-                count += 4
+                count += 2
                 
         else:
             if (right_block == head):
@@ -325,13 +325,14 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
                 count -= 2
             if (up_block == head):
                 count -= 2
+        counter += 1
 
 
     if (blockx == 0 or blockx == max):
         count -= 1
     if (blocky == 0 or blocky == max):
         count -= 1
-    
+        
     return count
     
     
