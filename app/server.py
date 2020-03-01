@@ -123,8 +123,18 @@ def eat_food(lod, food, body):
     
     # need to find a more efficient path to closest food
     # pick the closest food
-
-    food1 = food[0]
+    
+    nearest = 100
+    
+    food1 = []
+    
+    for item in food: 
+        x = abs(item["x"] - headx)
+        y = abs(item["y"] - heady)
+        distance = x + y 
+        if (distance < nearest):
+            nearest = distance
+            food1 = item
 
     if (headx > food1["x"]):
         if ("left" in lod):
@@ -144,6 +154,7 @@ def eat_food(lod, food, body):
     else: 
         print("Uh oh...")
         return "up"
+
 
 # list -> list
 # makes a list of all the occupied spots on the map
