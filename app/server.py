@@ -211,8 +211,8 @@ def body_sensor(lod, body, snakes, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max)
             
             if (choice1 > choice2):
                 del lod[1]
