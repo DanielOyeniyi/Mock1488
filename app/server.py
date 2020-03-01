@@ -124,91 +124,116 @@ def next_move(data):
         directions = ["up", "down", "left", "right"]   # middle of board
         return body_sensor(directions, body)
     
-    
-# list, dict -> string 
-# takes a list of possible directions and a dict 
-# representing your snakes body locations and produce a move
-# that won't make the snake eat itself
-def bad_direction(lod, body): 
-    # first focus on a 3 body snake
-    # might have to individual cases depending on the contents of the 
-    # lod, but is it posible to remove the bad directions from the dict? 
-    # yes loop through the list, and if it comtains bad directions then don't 
-    # append it to you good directions list
-    # first deal with the case where the snakes body(block after the head)
-    # then if it is a perfect line
-    # replicate if it is more than 3
-    # you start with only 1 head
-    
-    head = body[0]
-    try:
-        after_head = body[1]
-    except IndexError:  
-        return random.choice(lod)    
-        
-    # if body is to the right of head and on the same line
-    if (head["x"] + 1 == after_head["x"] and head["y"] == after_head["y"]):
-        return good_direction(lod, "right")
-        
-    # if body is to the left of the head and on the same line
-    elif (head["x"] - 1 == after_head["x"] and head["y"] == after_head["y"]):
-        return good_direction(lod, "left")
-        
-    # if body is below the head and on the same line
-    elif (head["y"] + 1 == after_head["y"] and head["x"] == after_head["x"]):
-        return good_direction(lod, "down")
-        
-    # if body is above the head and on the same line
-    elif (head["y"] - 1 == after_head["y"] and head["x"] == after_head["x"]): 
-        return good_direction(lod, "up")
-        
-    else:
-        return random.choice(lod)
 
 
+# we want our snake to choose the block that has the least amount of bodies around it 
 
+# list, dict -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
 def body_sensor(lod, body):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
-    option1 = {"x": headx+1, "y": heady}    # right block
-    option2 = {"x": headx-1, "y": heady}    # left block   
-    option3 = {"x": headx, "y": heady+1}    # down block
-    option4 = {"x": headx, "y": heady-1}    # up block 
+    right_block = {"x": headx+1, "y": heady}    
+    left_block = {"x": headx-1, "y": heady}      
+    down_block = {"x": headx, "y": heady+1}   
+    up_block = {"x": headx, "y": heady-1}    
 
-    if (option1 in body and "right" in lod): 
+    if (right_block in body and "right" in lod):  
         lod.remove("right")
-        
-    if (option2 in body and "left" in lod):
-        lod.remove("left")
-        
-    if (option3 in body and "down" in lod):
-        lod.remove("down")
-        
-    if (option4 in body and "up" in lod):
+    if (left_block in body and "left" in lod):
+        lod.remove("left")    
+    if (up_block in body and "down" in lod):
+        lod.remove("down")       
+    if (down_block in body and "up" in lod):
         lod.remove("up")
         
-    if (len(lod) != 0):
-        return random.choice(lod)
+    if (len(lod) != 0):                 
+        if (len(lod) == 1):
+            return lod[0]
+            
+        elif (len(lod) == 2):   # here is where we actually want to compare the options
+            block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
+            block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
+            
+            choice1 = advanced_body_sensor(block1, body)
+            choice2 = advanced_body_sensot(block2, body)
+            
+            if (choice1 > choice2):
+                return lod[0]
+            elif (choice2 < choice1):
+                return lod[1]
+            else:                                      # when they are equal
+                return random.choice(lod)
+            
+        elif (len(lod) == 3):
+            block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
+            block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
+            block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
+            
+            choice1 = advanced_body_sensor(block1, body)
+            choice2 = advanced_body_sensor(block2, body)
+            choice3 = advanced_body_sensor(block3, body)
+            
+            if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
+                return lod[0]                
+            elif (choice2 > choice1 and choice2 > choice3):   # choice2 is biggest
+                return lod[1]                
+            elif (choice3 > choice1 and choice3 > choice2):   # choice3 is biggest
+                return lod[2]                
+            elif (choice1 == choice2 and choice1 > choice3):  # choice1 & choice2 are equal, & greater than choice3 
+                del lod[2]
+                return random.choice(lod)                
+            elif (choice1 == choice3 and choice1 > choice2):  # choice1 & choice3 are equal, & greater than choice2 
+                del lod[1]
+                return random.choice(lod)                
+            elif (choice2 == choice3 and choice2 > choice1):  # choice2 & choice3 are equal, & greater than choice1
+                del lod[0]
+                return random.choice(lod)                
+            else:                                             # they are all equal                    
+                return random.choice(lod)
+            
+        else:
+            return random.choice(lod)
     else: 
         print("we are surrounded....")
         return "up"
+ 
+# dict, dict -> int
+# takes the block and returns the # of options
+# the snake has in this block
+def advanced_body_sensor(block, body): 
+    blockx = block["x"]
+    blocky = block["y"]
+    right_block = {"x": blockx+1, "y": blocky} 
+    left_block = {"x": blockx-1, "y": blocky}
+    down_block = {"x": blockx, "y": blocky+1}
+    up_block = {"x": blockx, "y": blocky-1} 
+    count = 0                                 # count of available moves                    
     
+    if (right_block not in body):
+        count += 1       
+    if (left_block not in body):
+        count += 1        
+    if (down_block not in body):
+        count += 1        
+    if (up_block not in body): 
+        count += 1
+        
+    return count
     
-    
-    
-
-
-# list, string -> string 
-# takes a list of directions and a bad direction
-# then returns a list of only good directions
-def good_direction(lod, bad): 
-    lod.remove(bad)
-    good_list = lod
-    return good_list 
-
+# string, dict, dict, dict, dict -> dict
+# takes direction and returns the corresponding block location
+def block_picker(direction, right_block, left_block, down_block, up_block):    
+    if (direction == "right"):
+        return right_block
+    elif (direction == "left"):
+        return left_block
+    elif (direction == "down"):
+        return down_block
+    else: 
+        return up_block
 
 @bottle.post("/end")
 def end():
