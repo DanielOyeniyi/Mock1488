@@ -144,9 +144,9 @@ def body_sensor(lod, body):
         lod.remove("right")
     if (left_block in body and "left" in lod):
         lod.remove("left")    
-    if (up_block in body and "down" in lod):
+    if (down_block in body and "down" in lod):
         lod.remove("down")       
-    if (down_block in body and "up" in lod):
+    if (up_block in body and "up" in lod):
         lod.remove("up")
         
     if (len(lod) != 0):                 
