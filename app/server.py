@@ -69,14 +69,14 @@ def move():
 # dict -> string
 # takes a dict containg board info and produces a direction
 def next_move(data):
-    turn = data["turn"]            # turn is a int representign the turn in game
-    you = data["you"]              # you is a dict representing your snakes data
-    board = data["board"]          # board is a dict representing the game board info
-    snakes = board["snakes"]
-    body = you["body"]             # body is a list of dicts representing your snakes location
-    head = body[0]                 # head is a dict representing your snakes head
-    max = board["height"]          # max is the dimention number e.g. 14 by 14
-    max -= 1                       # we start counting at 0 because we are coders
+    turn = data["turn"]                 # turn is a int representign the turn in game
+    you = data["you"]                   # you is a dict representing your snakes data
+    board = data["board"]               # board is a dict representing the game board info
+    snakes = occupied(board["snakes"])  # locations of occupied spots on the board
+    body = you["body"]                  # body is a list of dicts representing your snakes location
+    head = body[0]                      # head is a dict representing your snakes head
+    max = board["height"]               # max is the dimention number e.g. 14 by 14
+    max -= 1                            # we start counting at 0 because we are coders
     
     # directions = ["up", "down", "left", "right"]
     # bad_snake(directions, body)
@@ -126,10 +126,19 @@ def next_move(data):
         return body_sensor(directions, body, snakes, max)
     
 
+# list -> list
+# makes a list of all the occupied spots on the map
+def occupied(snakes):
+    occupied = []
+    for snake in snakes:
+        body = snake["body"]
+        for block in body: 
+            occupied.append(block)
+    return occupied
 
 # we want our snake to choose the block that has the least amount of bodies around it 
 
-# list, dict, int -> string
+# list, list, int -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
 def body_sensor(lod, body, snakes, max):
@@ -145,27 +154,14 @@ def body_sensor(lod, body, snakes, max):
     # would be way more efficient if you just kept a dict of all the 
     # occupied locations on the board
 
-    if (right_block in body and "right" in lod):  
+    if (right_block in snakes and "right" in lod):  
         lod.remove("right")
-    if (left_block in body and "left" in lod):
+    if (left_block in snakes and "left" in lod):
         lod.remove("left")    
-    if (down_block in body and "down" in lod):
+    if (down_block in snakes and "down" in lod):
         lod.remove("down")       
-    if (up_block in body and "up" in lod):
+    if (up_block in snakes and "up" in lod):
         lod.remove("up")
-        
-    if (len(snakes) == 1):  
-        snake1 = snakes[0]
-        snake1_body = snake1["body"]
-        
-        if (right_block in snake1_body and "right" in lod):  
-            lod.remove("right")
-        if (left_block in snake1_body and "left" in lod):
-            lod.remove("left")    
-        if (down_block in snake1_body and "down" in lod):
-            lod.remove("down")       
-        if (up_block in snake1_body and "up" in lod):
-            lod.remove("up")
         
     if (len(lod) != 0):                 
         if (len(lod) == 1):
@@ -175,8 +171,8 @@ def body_sensor(lod, body, snakes, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body, snakes, max)
-            choice2 = advanced_body_sensor(block2, body, snakes, max)
+            choice1 = advanced_body_sensor(block1, snakes, max)
+            choice2 = advanced_body_sensor(block2, snakes, max)
             
             if (choice1 > choice2):
                 return lod[0]
@@ -190,9 +186,9 @@ def body_sensor(lod, body, snakes, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body, snakes, max)
-            choice2 = advanced_body_sensor(block2, body, snakes, max)
-            choice3 = advanced_body_sensor(block3, body, snakes, max)
+            choice1 = advanced_body_sensor(block1, snakes, max)
+            choice2 = advanced_body_sensor(block2, snakes, max)
+            choice3 = advanced_body_sensor(block3, snakes, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 return lod[0]                
@@ -221,36 +217,33 @@ def body_sensor(lod, body, snakes, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, body, snakes, max):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, max):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
     left_block = {"x": blockx-1, "y": blocky}
     down_block = {"x": blockx, "y": blocky+1}
     up_block = {"x": blockx, "y": blocky-1} 
-    count = 0                                 # count of available moves                    
+    count = 0                                 # count of available blocks                  
     
-    # what about the case where blockx or blocky is -1 or 11?
-    if (len(snakes) == 2):
-        snake1 = snakes[0]
-        snake1_body = snake1["body"]
-        
-        if (right_block not in body and right_block not in snake1_body):
-            count += 1       
-        if (left_block not in body and left_block not in snake1_body):
-            count += 1        
-        if (down_block not in body and down_block not in snake1_body):
-            count += 1        
-        if (up_block not in body and up_block not in snake1_body): 
-            count += 1
+
+    if (right_block not in snakes):
+        count += 1       
+    if (left_block not in snakes):
+        count += 1        
+    if (down_block not in snakes):
+        count += 1        
+    if (up_block not in snakes): 
+        count += 1
         
     if (blockx == 0 or blockx == max):
         count -= 1
     if (blocky == 0 or blockx == max):
         count -= 1
     
-    print(count)
     return count
+    
+    
     
 # string, dict, dict, dict, dict -> dict
 # takes direction and returns the corresponding block location
