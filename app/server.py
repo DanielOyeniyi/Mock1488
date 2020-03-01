@@ -158,7 +158,7 @@ def body_sensor(lod, body):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
             choice1 = advanced_body_sensor(block1, body)
-            choice2 = advanced_body_sensot(block2, body)
+            choice2 = advanced_body_sensor(block2, body)
             
             if (choice1 > choice2):
                 return lod[0]
