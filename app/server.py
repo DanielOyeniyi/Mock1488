@@ -71,61 +71,118 @@ def next_move(data):
     snakes = board["snakes"]                 # locations of occupied spots on the board
     food = board["food"]                     # locations of food on the board
     body = you["body"]                       # body is a list of dicts representing your snakes location
+    ownsize = len(body)                      # size of your own snake
     health = you["health"]                   # health of the snake
     head = body[0]                           # head is a dict representing your snakes head
     max = board["height"]                    # max is the dimention number e.g. 14 by 14
     max -= 1
     
+    # you could use less parameters if you just sent the board
+    # yeah, it would be way easier to read, it makes more sense
+    
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return eat_food(body_sensor(directions, body, snakes, max, food), food, body)
+        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+    
+# list, list, dict, int, list, int  
+def chase_or_feast(lod, snakes, head, ownsize, food):
+    headx = head["x"]
+    heady = head["y"]
+    sizes = make_sizes(snakes)
+    nearest = 100
+    
+    target = []
+    print(snakes)
+    for snake in snakes:
+        body = snake["body"]
+        snake_head = body[0]
+        x = abs(snake_head["x"] - headx)
+        y = abs(snake_head["y"] - heady)
+        distance = x + y
+        if (distance < nearest):
+            nearest = distance 
+            target = snake_head
+            
+            
+    if (len(target) != 0):
+        if (headx > target["x"]):
+            if ("left" in lod):
+                return "left"
+        if (headx < target["x"]):
+            if ("right" in lod):
+                return "right"
+        if (heady > target["y"]):
+            if ("up" in lod):
+                return "up"
+        if (heady < target["y"]):
+            if ("down" in lod):
+                return "down"
+
+    if (len(lod) != 0):
+        return eat_food(lod, food, head)
+    else: 
+        print("Uh oh...")
+        return "up"
     
 
 # list, list -> string
 # takes a list of possible directions and 
 # picks a direction that will go towards food
-def eat_food(lod, food, body):
-    head = body[0]
+def eat_food(lod, food, head):
     headx = head["x"]
     heady = head["y"]
     
-    # need to find a more efficient path to closest food
-    # pick the closest food
-    
-    nearest = 100
-    
+ 
+    nearest = 100   
     food1 = []
     
     for item in food: 
@@ -135,6 +192,7 @@ def eat_food(lod, food, body):
         if (distance < nearest):
             nearest = distance
             food1 = item
+            
 
     if (headx > food1["x"]):
         if ("left" in lod):
@@ -166,13 +224,17 @@ def make_occupied(snakes):
             occupied.append(block)
     return occupied
     
+# list -> list
+# makes a list of all the tails on the board
 def make_tails(snakes): 
     tails = []
     for snake in snakes: 
         body = snake["body"]
         tails.append(body[-1])
     return tails
-    
+  
+# list -> list
+# makes a list of all the heads on the board
 def make_heads(snakes): 
     heads = []
     for snake in snakes: 
@@ -180,6 +242,8 @@ def make_heads(snakes):
         heads.append(body[0])
     return heads
 
+# list -> list
+# makes a list of all the snakes sizes
 def make_sizes(snakes): 
     sizes = []
     for snake in snakes: 
@@ -192,23 +256,22 @@ def make_sizes(snakes):
 # list, list, int -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
-def body_sensor(lod, body, snakes, max, food):
-    head = body[0]
+def body_sensor(lod, head, snakes, max, food, ownsize):
     headx = head["x"]
     heady = head["y"]
-    ownsize = len(body)
     tails = make_tails(snakes)
     heads = make_heads(snakes)
-    heads.remove(head)
     sizes = make_sizes(snakes)
     snakes = make_occupied(snakes)
+    
+    
     right_block = {"x": headx+1, "y": heady}    
     left_block = {"x": headx-1, "y": heady}      
     down_block = {"x": headx, "y": heady+1}   
     up_block = {"x": headx, "y": heady-1}    
     
     
-
+    # removing isntanst death options
     if (right_block in snakes and "right" in lod):  
         lod.remove("right")
     if (left_block in snakes and "left" in lod):
@@ -222,7 +285,7 @@ def body_sensor(lod, body, snakes, max, food):
         if (len(lod) == 1):
             return lod
             
-        elif (len(lod) == 2):   # here is where we actually want to compare the options
+        elif (len(lod) == 2):   
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
@@ -235,7 +298,7 @@ def body_sensor(lod, body, snakes, max, food):
             elif (choice2 > choice1):
                 del lod[0]
                 return lod
-            else:                                      # when they are equal
+            else:                                      
                 return lod
             
         elif (len(lod) == 3):
@@ -282,94 +345,98 @@ def body_sensor(lod, body, snakes, max, food):
     else: 
         return []
  
-# dict, dict, int -> int
+# dict, list, list, list, int, int, list -> int
 # takes the block and returns the # of options
 # the snake has in this block
 def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
+    
+    # reachable directions
     right_block = {"x": blockx+1, "y": blocky} 
     left_block = {"x": blockx-1, "y": blocky}
     down_block = {"x": blockx, "y": blocky+1}
-    up_block = {"x": blockx, "y": blocky-1} 
-    count = 0                                 # count of available blocks                  
+    up_block = {"x": blockx, "y": blocky-1}             
 
-    # keep track of sizes, if size is smaller than you attack the head
-    # find quickest path to oponents head if smaller
+    # unreachable(diagonal) directions
+    top_right_block = {"x": blockx+1, "y": blocky-1}
+    top_left_block = {"x": blockx-1, "y": blocky-1}
+    bottom_right_block = {"x": blockx+1, "y": blocky+1}
+    bottom_left_block = {"x": blockx-1, "y": blocky+1}
+    
+    blocks = [right_block, left_block, down_block, up_block, top_right_block, 
+             top_left_block, bottom_right_block, bottom_left_block]
+    
+    count = 0           # a weighted measurement of the block priority
+      
+    # now case like, don't be agressive if you are close to walls or something
+    # e.g. don't chase if your body and another head are in the way
+    # go along your body rather than pathing in tight spots to give self room 
+    # smaller board makes you focus on proper pathing
+    # can I use the same method I used to target food to tartget heads?
+    # better counting is key
+    
     if (block in food):
-        count += 5
+        count += 2
         
-    if (right_block not in snakes):
-        if (right_block["x"] != max+1 and right_block["x"] != -1):
-            if (right_block["y"] != max+1 and right_block["y"] != -1):
-                count += 1  
-                
-    if (left_block not in snakes):
-        if (left_block["x"] != max+1 and left_block["x"] != -1):
-            if (left_block["y"] != max+1 and left_block["y"] != -1):
-                count += 1 
-                
-    if (down_block not in snakes):
-        if (down_block["x"] != max+1 and down_block["x"] != -1):
-            if (down_block["y"] != max+1 and down_block["y"] != -1):
-                count += 1 
-                
-    if (up_block not in snakes): 
-        if (up_block["x"] != max+1 and up_block["x"] != -1):
-            if (up_block["y"] != max+1 and up_block["y"] != -1):
-                count += 1 
-
+    for block1 in blocks: 
+        count += zone_check(block1, snakes, max)
+    
+    
     for tail in tails:
-        if (right_block == tail):
-            count += 1
-        if (left_block == tail):
-            count += 1
-        if (down_block == tail):
-            count += 1
-        if (up_block == tail):
-            count += 1
+        for block1 in blocks: 
+            count += zone_check_tails(block1, tail)
 
     counter = 0
     for head in heads:                  # look to kill if bigger, run away if smaller
-        if (ownsize > sizes[counter]):           
-            if (right_block == head):
-                count += 10
-            if (left_block == head):
-                count += 10
-            if (down_block == head):
-                count += 10
-            if (up_block == head):
-                count += 10
-                
-        else:
-            if (right_block == head):
-                count -= 10
-            if (left_block == head):
-                count -= 10
-            if (down_block == head):
-                count -= 10
-            if (up_block == head):
-                count -= 10
+        for block1 in blocks:
+            count += zone_check_heads(block1, head, ownsize, sizes, counter)
         counter += 1
 
     for item in food: 
-        if (right_block == item):
-            count += 3
-        if (left_block == item):
-            count += 3
-        if (down_block == item):
-            count += 3
-        if (up_block == item):
-            count += 3
-
-    if (blockx == -1 or blockx == max+1):
+        for block1 in blocks:  
+            count += zone_check_food(block1, item)
+    
+    if (blockx == -1 or blockx == max+1):  # remove the count of blocks that are out of bounds
         count -= 1
     if (blocky == -1 or blocky == max+1):
         count -= 1
-       
+        
     return count
     
+# dict, list -> int
+# takes a block and checks if any snake is 
+# in this block or not
+def zone_check(block, snakes, max):
+    if (block not in snakes):
+        if (block["x"] != max+1 and block["x"] != -1):
+            if (block["y"] != max+1 and block["y"] != -1):
+                return 1 
+    return 0
     
+# dict, dict -> int
+# takes a block and checks if tail is in it or not
+def zone_check_tails(block, tail):
+    if (block == tail):
+        return 1
+    return 0
+    
+# dict, dict, int, list, int ->  int
+# takes a block and checks if head is in it or not
+def zone_check_heads(block, head, ownsize, sizes, counter):
+    if (ownsize > sizes[counter]):
+        if (block == head):
+            return 3
+    if (block == head):
+        return -3
+    return 0
+    
+# dict, dict -> int
+# takes a block and checks if food is in it or not
+def zone_check_food(block, item):
+    if (block == item):
+        return 2
+    return 0
     
 # string, dict, dict, dict, dict -> dict
 # takes direction and returns the corresponding block location
