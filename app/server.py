@@ -73,6 +73,7 @@ def next_move(data):
     you = data["you"]                   # you is a dict representing your snakes data
     board = data["board"]               # board is a dict representing the game board info
     snakes = occupied(board["snakes"])  # locations of occupied spots on the board
+    food = board["food"]                # locations of food on the board
     body = you["body"]                  # body is a list of dicts representing your snakes location
     head = body[0]                      # head is a dict representing your snakes head
     max = board["height"]               # max is the dimention number e.g. 14 by 14
@@ -91,40 +92,69 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return body_sensor(directions, body, snakes, max)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body)
     
+
+# list, list -> string
+# takes a list of possible directions and 
+# picks a direction that will go towards food
+def eat_food(lod, food, body):
+    head = body[0]
+    headx = head["x"]
+    heady = head["y"]
+    food1 = food[0]
+    food1x = food1["x"]
+    fodd1y = food1["y"]
+    
+    if ("right" in lod): 
+        if (headx < food1x): 
+            return "right"
+    if ("left" in lod):
+        if (headx > food1x):
+            return "left"
+    if ("down" in lod):
+        if (heady < food1y):
+            return "down"
+    if ("up" in lod):   
+        if (heady > food1y):
+            return "up"
+    if (lod != 0):
+        return random.choice(lod)
+    else: 
+        print("Uh oh...")
+        return "up"
 
 # list -> list
 # makes a list of all the occupied spots on the map
@@ -136,7 +166,7 @@ def occupied(snakes):
             occupied.append(block)
     return occupied
 
-# we want our snake to choose the block that has the least amount of bodies around it 
+# we want our code to now go after food
 
 # list, list, int -> string
 # should sense the possible options and pick the ones
@@ -165,7 +195,7 @@ def body_sensor(lod, body, snakes, max):
         
     if (len(lod) != 0):                 
         if (len(lod) == 1):
-            return lod[0]
+            return lod
             
         elif (len(lod) == 2):   # here is where we actually want to compare the options
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
@@ -175,11 +205,13 @@ def body_sensor(lod, body, snakes, max):
             choice2 = advanced_body_sensor(block2, snakes, max)
             
             if (choice1 > choice2):
-                return lod[0]
+                del lod[1]
+                return lod
             elif (choice2 > choice1):
-                return lod[1]
+                del lod[0]
+                return lod
             else:                                      # when they are equal
-                return random.choice(lod)
+                return lod
             
         elif (len(lod) == 3):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
@@ -191,28 +223,39 @@ def body_sensor(lod, body, snakes, max):
             choice3 = advanced_body_sensor(block3, snakes, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
-                return lod[0]                
+                del lod[2]
+                del lod[1]
+                return lod    
+                
             elif (choice2 > choice1 and choice2 > choice3):   # choice2 is biggest
-                return lod[1]                
+                del lod[2]
+                del lod[0]
+                return lod    
+                
             elif (choice3 > choice1 and choice3 > choice2):   # choice3 is biggest
-                return lod[2]                
+                del lod[1]
+                del lod[0]
+                return lod   
+                
             elif (choice1 == choice2 and choice1 > choice3):  # choice1 & choice2 are equal, & greater than choice3 
                 del lod[2]
-                return random.choice(lod)                
+                return lod
+                
             elif (choice1 == choice3 and choice1 > choice2):  # choice1 & choice3 are equal, & greater than choice2 
                 del lod[1]
-                return random.choice(lod)                
+                return lod 
+                
             elif (choice2 == choice3 and choice2 > choice1):  # choice2 & choice3 are equal, & greater than choice1
                 del lod[0]
-                return random.choice(lod)                
+                return lod        
+                
             else:                                             # they are all equal                    
-                return random.choice(lod)
+                return lod
             
         else:
-            return random.choice(lod)
+            return lod
     else: 
-        print("we are surrounded....")
-        return "up"
+        return []
  
 # dict, dict, int -> int
 # takes the block and returns the # of options
