@@ -296,15 +296,28 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
 
     # keep track of sizes, if size is smaller than you attack the head
     # find quickest path to oponents head if smaller
-
+    if (block in food):
+        count += 5
+        
     if (right_block not in snakes):
-        count += 1       
+        if (right_block["x"] != max and right_block["x"] != -1):
+            if (right_block["y"] != max and right_block["y"] != -1):
+                count += 1  
+                
     if (left_block not in snakes):
-        count += 1        
+        if (left_block["x"] != max and left_block["x"] != -1):
+            if (left_block["y"] != max and left_block["y"] != -1):
+                count += 1 
+                
     if (down_block not in snakes):
-        count += 1        
+        if (down_block["x"] != max and down_block["x"] != -1):
+            if (down_block["y"] != max and down_block["y"] != -1):
+                count += 1 
+                
     if (up_block not in snakes): 
-        count += 1
+        if (up_block["x"] != max and up_block["x"] != -1):
+            if (up_block["y"] != max and up_block["y"] != -1):
+                count += 1 
 
     for tail in tails:
         if (right_block == tail):
@@ -320,13 +333,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
     for head in heads:                  # look to kill if bigger, run away if smaller
         if (ownsize > sizes[counter]):           
             if (right_block == head):
-                count += 6
+                count += 10
             if (left_block == head):
-                count += 6
+                count += 10
             if (down_block == head):
-                count += 6
+                count += 10
             if (up_block == head):
-                count += 6
+                count += 10
                 
         else:
             if (right_block == head):
@@ -354,9 +367,6 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
     if (blocky == -1 or blocky == max):
         count -= 1
        
-    print(food)
-    print(down_block)
-    print(count)
     return count
     
     
