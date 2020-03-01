@@ -343,13 +343,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
                 
         else:
             if (right_block == head):
-                count -= 2
+                count -= 10
             if (left_block == head):
-                count -= 2
+                count -= 10
             if (down_block == head):
-                count -= 2
+                count -= 10
             if (up_block == head):
-                count -= 2
+                count -= 10
         counter += 1
 
     for item in food: 
