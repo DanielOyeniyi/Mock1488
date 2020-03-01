@@ -124,21 +124,21 @@ def eat_food(lod, food, body, health):
     
     # need to find a more efficient path to closest food
     # pick the closest food
-    if (len(food) != 0):
-        food1 = food[1]
-    
-        if (headx > food1["x"]):
-            if ("left" in lod):
-                return "left"
-        if (headx < food1["x"]):
-            if ("right" in lod):
-                return "right"
-        if (heady > food1["y"]):
-            if ("up" in lod):
-                return "up"
-        if (heady < food1["y"]):
-            if ("down" in lod):
-                return "down"
+
+    food1 = food[0]
+
+    if (headx > food1["x"]):
+        if ("left" in lod):
+            return "left"
+    if (headx < food1["x"]):
+        if ("right" in lod):
+            return "right"
+    if (heady > food1["y"]):
+        if ("up" in lod):
+            return "up"
+    if (heady < food1["y"]):
+        if ("down" in lod):
+            return "down"
 
     if (len(lod) != 0):
         return random.choice(lod)
