@@ -90,48 +90,48 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return body_sensor(directions, body)
+        return body_sensor(directions, body, max)
     
 
 
 # we want our snake to choose the block that has the least amount of bodies around it 
 
-# list, dict -> string
+# list, dict, int -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
-def body_sensor(lod, body):
+def body_sensor(lod, body, max):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
@@ -157,12 +157,12 @@ def body_sensor(lod, body):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body)
-            choice2 = advanced_body_sensor(block2, body)
+            choice1 = advanced_body_sensor(block1, body, max)
+            choice2 = advanced_body_sensor(block2, body, max)
             
             if (choice1 > choice2):
                 return lod[0]
-            elif (choice2 < choice1):
+            elif (choice2 > choice1):
                 return lod[1]
             else:                                      # when they are equal
                 return random.choice(lod)
@@ -172,9 +172,9 @@ def body_sensor(lod, body):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body)
-            choice2 = advanced_body_sensor(block2, body)
-            choice3 = advanced_body_sensor(block3, body)
+            choice1 = advanced_body_sensor(block1, body, max)
+            choice2 = advanced_body_sensor(block2, body, max)
+            choice3 = advanced_body_sensor(block3, body, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 return lod[0]                
@@ -200,10 +200,10 @@ def body_sensor(lod, body):
         print("we are surrounded....")
         return "up"
  
-# dict, dict -> int
+# dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, body): 
+def advanced_body_sensor(block, body, max): 
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
@@ -211,6 +211,8 @@ def advanced_body_sensor(block, body):
     down_block = {"x": blockx, "y": blocky+1}
     up_block = {"x": blockx, "y": blocky-1} 
     count = 0                                 # count of available moves                    
+    
+    # what about the case where blockx or blocky is -1 or 11?
     
     if (right_block not in body):
         count += 1       
@@ -220,7 +222,13 @@ def advanced_body_sensor(block, body):
         count += 1        
     if (up_block not in body): 
         count += 1
-        
+    
+    if (blockx == 0 or blockx == max):
+        count -= 1
+    if (blocky == 0 or blockx == max):
+        count -= 1
+    
+    print(count)
     return count
     
 # string, dict, dict, dict, dict -> dict
