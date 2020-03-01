@@ -292,13 +292,13 @@ def advanced_body_sensor(block, snakes, tails, heads, max):  # can we make it ch
             
     for head in heads:                  # place more danger in the heads
         if (right_block == head):
-            count -= 1
+            count -= 2
         if (left_block == head):
-            count -= 1
+            count -= 2
         if (down_block == head):
-            count -= 1
+            count -= 2
         if (up_block == head):
-            count -= 1
+            count -= 2
     
 
     if (blockx == 0 or blockx == max):
