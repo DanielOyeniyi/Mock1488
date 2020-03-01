@@ -136,7 +136,7 @@ def eat_food(lod, food, body):
     heady = head["y"]
     food1 = food[0]
     food1x = food1["x"]
-    fodd1y = food1["y"]
+    food1y = food1["y"]
     
     if ("right" in lod): 
         if (headx < food1x): 
