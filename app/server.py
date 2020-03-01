@@ -75,6 +75,7 @@ def next_move(data):
     snakes = occupied(board["snakes"])  # locations of occupied spots on the board
     food = board["food"]                # locations of food on the board
     body = you["body"]                  # body is a list of dicts representing your snakes location
+    health = you["health"]               # health of the snake
     head = body[0]                      # head is a dict representing your snakes head
     max = board["height"]               # max is the dimention number e.g. 14 by 14
     max -= 1                            # we start counting at 0 because we are coders
@@ -92,61 +93,62 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return eat_food(body_sensor(directions, body, snakes, max), food, body)
+        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
     
 
 # list, list -> string
 # takes a list of possible directions and 
 # picks a direction that will go towards food
-def eat_food(lod, food, body):
+def eat_food(lod, food, body, health):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
-
-    for item in food:
-        if (headx == item["x"]):
-            if (heady < item["y"] and "down" in lod):
-                return "down"
-            if (heady > item["y"] and "up" in lod):
-                return "up"
-                
-        if (heady == item["y"]):
-            if (headx < item["x"] and "right" in lod):
-                return "right"
-            if (headx > item["x"] and "left" in lod):
-                return "left"
+    
+    if (health <= 20):
+        for item in food:
+            if (headx == item["x"]):
+                if (heady < item["y"] and "down" in lod):
+                    return "down"
+                if (heady > item["y"] and "up" in lod):
+                    return "up"
+                    
+            if (heady == item["y"]):
+                if (headx < item["x"] and "right" in lod):
+                    return "right"
+                if (headx > item["x"] and "left" in lod):
+                    return "left"
             
     if (len(lod) != 0):
         return random.choice(lod)
