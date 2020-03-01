@@ -166,6 +166,14 @@ def make_heads(snakes):
         heads.append(body[0])
     return heads
 
+def make_sizes(snakes): 
+    sizes = []
+    for snake in snakes: 
+        body = snake["body"]
+        size = len(body)
+        sizes.append(size)
+    return sizes
+
 
 # list, list, int -> string
 # should sense the possible options and pick the ones
@@ -176,6 +184,7 @@ def body_sensor(lod, body, snakes, max):
     heady = head["y"]
     tails = make_tails(snakes)
     heads = make_heads(snakes)
+    sizes = make_sizes(snakes)
     snakes = make_occupied(snakes)
     right_block = {"x": headx+1, "y": heady}    
     left_block = {"x": headx-1, "y": heady}      
@@ -201,8 +210,8 @@ def body_sensor(lod, body, snakes, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, max)
             
             if (choice1 > choice2):
                 del lod[1]
@@ -218,9 +227,9 @@ def body_sensor(lod, body, snakes, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads,max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, max)
-            choice3 = advanced_body_sensor(block3, snakes, tails, heads, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, max)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, max)
+            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 del lod[2]
@@ -260,7 +269,7 @@ def body_sensor(lod, body, snakes, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, snakes, tails, heads, max):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, tails, heads, sizes, max):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
@@ -269,7 +278,7 @@ def advanced_body_sensor(block, snakes, tails, heads, max):  # can we make it ch
     up_block = {"x": blockx, "y": blocky-1} 
     count = 0                                 # count of available blocks                  
  
-    # what about the head? diagonal?
+    # keep track of sizes, if size is smaller than you attack the head
 
     if (right_block not in snakes):
         count += 1       
@@ -289,16 +298,28 @@ def advanced_body_sensor(block, snakes, tails, heads, max):  # can we make it ch
             count += 1
         if (up_block == tail):
             count += 1
-            
+    
+    counter = 0
     for head in heads:                  # place more danger in the heads
-        if (right_block == head):
-            count -= 2
-        if (left_block == head):
-            count -= 2
-        if (down_block == head):
-            count -= 2
-        if (up_block == head):
-            count -= 2
+        if (sizes[0] > sizes[0]):           
+            if (right_block == head):
+                count += 2
+            if (left_block == head):
+                count += 2
+            if (down_block == head):
+                count += 2
+            if (up_block == head):
+                count += 2
+        else:
+            if (right_block == head):
+                count -= 2
+            if (left_block == head):
+                count -= 2
+            if (down_block == head):
+                count -= 2
+            if (up_block == head):
+                count -= 2
+        counter += 1
     
 
     if (blockx == 0 or blockx == max):
