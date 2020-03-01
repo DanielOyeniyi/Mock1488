@@ -122,6 +122,8 @@ def eat_food(lod, food, body, health):
     headx = head["x"]
     heady = head["y"]
     
+    # need to find a more efficient path to closest food
+    
     if (health < 101):
         for item in food:
             if (headx == item["x"]):
@@ -185,6 +187,7 @@ def body_sensor(lod, body, snakes, max):
     ownsize = len(body)
     tails = make_tails(snakes)
     heads = make_heads(snakes)
+    heads.remove(head)
     sizes = make_sizes(snakes)
     snakes = make_occupied(snakes)
     right_block = {"x": headx+1, "y": heady}    
@@ -280,6 +283,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
     count = 0                                 # count of available blocks                  
 
     # keep track of sizes, if size is smaller than you attack the head
+    # find quickest path to oponents head if smaller
 
     if (right_block not in snakes):
         count += 1       
@@ -300,17 +304,17 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
         if (up_block == tail):
             count += 1
 
-    counter = 0
-    for head in heads:                  # place more danger in the heads
-        if (ownsize > sizes[counter]):           
+
+    for head in heads:                  # look to kill if bigger, run away if smaller
+        if (ownsize > len(head)):           
             if (right_block == head):
-                count += 2
+                count += 4
             if (left_block == head):
-                count += 2
+                count += 4
             if (down_block == head):
-                count += 2
+                count += 4
             if (up_block == head):
-                count += 2
+                count += 4
                 
         else:
             if (right_block == head):
@@ -321,14 +325,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
                 count -= 2
             if (up_block == head):
                 count -= 2
-        counter += 1
 
 
     if (blockx == 0 or blockx == max):
         count -= 1
-    if (blocky == 0 or blockx == max):
+    if (blocky == 0 or blocky == max):
         count -= 1
-
+    
     return count
     
     
