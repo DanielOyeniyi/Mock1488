@@ -72,6 +72,7 @@ def next_move(data):
     turn = data["turn"]            # turn is a int representign the turn in game
     you = data["you"]              # you is a dict representing your snakes data
     board = data["board"]          # board is a dict representing the game board info
+    snakes = board["snakes"]
     body = you["body"]             # body is a list of dicts representing your snakes location
     head = body[0]                 # head is a dict representing your snakes head
     max = board["height"]          # max is the dimention number e.g. 14 by 14
@@ -90,39 +91,39 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return body_sensor(directions, body, max)
+        return body_sensor(directions, body, snakes, max)
     
 
 
@@ -131,7 +132,7 @@ def next_move(data):
 # list, dict, int -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
-def body_sensor(lod, body, max):
+def body_sensor(lod, body, snakes, max):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
@@ -139,6 +140,10 @@ def body_sensor(lod, body, max):
     left_block = {"x": headx-1, "y": heady}      
     down_block = {"x": headx, "y": heady+1}   
     up_block = {"x": headx, "y": heady-1}    
+    
+    
+    # would be way more efficient if you just kept a dict of all the 
+    # occupied locations on the board
 
     if (right_block in body and "right" in lod):  
         lod.remove("right")
@@ -149,6 +154,19 @@ def body_sensor(lod, body, max):
     if (up_block in body and "up" in lod):
         lod.remove("up")
         
+    if (len(snakes) == 1):  
+        snake1 = snakes[0]
+        snake1_body = snake1["body"]
+        
+        if (right_block in snake1_body and "right" in lod):  
+            lod.remove("right")
+        if (left_block in snake1_body and "left" in lod):
+            lod.remove("left")    
+        if (down_block in snake1_body and "down" in lod):
+            lod.remove("down")       
+        if (up_block in snake1_body and "up" in lod):
+            lod.remove("up")
+        
     if (len(lod) != 0):                 
         if (len(lod) == 1):
             return lod[0]
@@ -157,8 +175,8 @@ def body_sensor(lod, body, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body, max)
-            choice2 = advanced_body_sensor(block2, body, max)
+            choice1 = advanced_body_sensor(block1, body, snakes, max)
+            choice2 = advanced_body_sensor(block2, body, snakes, max)
             
             if (choice1 > choice2):
                 return lod[0]
@@ -172,9 +190,9 @@ def body_sensor(lod, body, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, body, max)
-            choice2 = advanced_body_sensor(block2, body, max)
-            choice3 = advanced_body_sensor(block3, body, max)
+            choice1 = advanced_body_sensor(block1, body, snakes, max)
+            choice2 = advanced_body_sensor(block2, body, snakes, max)
+            choice3 = advanced_body_sensor(block3, body, snakes, max)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 return lod[0]                
@@ -203,7 +221,7 @@ def body_sensor(lod, body, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, body, max): 
+def advanced_body_sensor(block, body, snakes, max):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
