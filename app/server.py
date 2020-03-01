@@ -79,39 +79,39 @@ def next_move(data):
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
-        return eat_food(body_sensor(directions, body, snakes, max), food, body, health)
+        return eat_food(body_sensor(directions, body, snakes, max, food), food, body, health)
     
 
 # list, list -> string
@@ -182,7 +182,7 @@ def make_sizes(snakes):
 # list, list, int -> string
 # should sense the possible options and pick the ones
 # that won't result in instant death
-def body_sensor(lod, body, snakes, max):
+def body_sensor(lod, body, snakes, max, food):
     head = body[0]
     headx = head["x"]
     heady = head["y"]
@@ -216,8 +216,8 @@ def body_sensor(lod, body, snakes, max):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food)
             
             if (choice1 > choice2):
                 del lod[1]
@@ -233,9 +233,9 @@ def body_sensor(lod, body, snakes, max):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max)
-            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food)
+            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max, food)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 del lod[2]
@@ -275,7 +275,7 @@ def body_sensor(lod, body, snakes, max):
 # dict, dict, int -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     right_block = {"x": blockx+1, "y": blocky} 
@@ -310,13 +310,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
     for head in heads:                  # look to kill if bigger, run away if smaller
         if (ownsize > sizes[counter]):           
             if (right_block == head):
-                count += 2
+                count += 6
             if (left_block == head):
-                count += 2
+                count += 6
             if (down_block == head):
-                count += 2
+                count += 6
             if (up_block == head):
-                count += 2
+                count += 6
                 
         else:
             if (right_block == head):
@@ -329,6 +329,15 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max):  # c
                 count -= 2
         counter += 1
 
+    for item in food: 
+        if (right_block == item):
+            count += 3
+        if (left_block == item):
+            count += 3
+        if (down_block == item):
+            count += 3
+        if (up_block == item):
+            count += 3
 
     if (blockx == 0 or blockx == max):
         count -= 1
