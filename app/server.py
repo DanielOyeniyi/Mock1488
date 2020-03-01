@@ -74,7 +74,7 @@ def next_move(data):
     health = you["health"]                   # health of the snake
     head = body[0]                           # head is a dict representing your snakes head
     max = board["height"]                    # max is the dimention number e.g. 14 by 14
- 
+    max -= 1
     
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
@@ -300,23 +300,23 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
         count += 5
         
     if (right_block not in snakes):
-        if (right_block["x"] != max and right_block["x"] != -1):
-            if (right_block["y"] != max and right_block["y"] != -1):
+        if (right_block["x"] != max+1 and right_block["x"] != -1):
+            if (right_block["y"] != max+1 and right_block["y"] != -1):
                 count += 1  
                 
     if (left_block not in snakes):
-        if (left_block["x"] != max and left_block["x"] != -1):
-            if (left_block["y"] != max and left_block["y"] != -1):
+        if (left_block["x"] != max+1 and left_block["x"] != -1):
+            if (left_block["y"] != max+1 and left_block["y"] != -1):
                 count += 1 
                 
     if (down_block not in snakes):
-        if (down_block["x"] != max and down_block["x"] != -1):
-            if (down_block["y"] != max and down_block["y"] != -1):
+        if (down_block["x"] != max+1 and down_block["x"] != -1):
+            if (down_block["y"] != max+1 and down_block["y"] != -1):
                 count += 1 
                 
     if (up_block not in snakes): 
-        if (up_block["x"] != max and up_block["x"] != -1):
-            if (up_block["y"] != max and up_block["y"] != -1):
+        if (up_block["x"] != max+1 and up_block["x"] != -1):
+            if (up_block["y"] != max+1 and up_block["y"] != -1):
                 count += 1 
 
     for tail in tails:
@@ -362,9 +362,9 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
         if (up_block == item):
             count += 3
 
-    if (blockx == -1 or blockx == max):
+    if (blockx == -1 or blockx == max+1):
         count -= 1
-    if (blocky == -1 or blocky == max):
+    if (blocky == -1 or blocky == max+1):
         count -= 1
        
     return count
