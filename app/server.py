@@ -290,8 +290,8 @@ def body_sensor(lod, head, snakes, max, food, ownsize):
             block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food, head)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food, head)
             
             if (choice1 > choice2):
                 del lod[1]
@@ -307,9 +307,9 @@ def body_sensor(lod, head, snakes, max, food, ownsize):
             block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
             block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
             
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food)
-            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max, food)
+            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food, head)
+            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food, head)
+            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max, food, head)
             
             if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
                 del lod[2]
@@ -349,7 +349,7 @@ def body_sensor(lod, head, snakes, max, food, ownsize):
 # dict, list, list, list, int, int, list -> int
 # takes the block and returns the # of options
 # the snake has in this block
-def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food):  # can we make it check even more possibilities?
+def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food, head):  # can we make it check even more possibilities?
     blockx = block["x"]
     blocky = block["y"]
     
@@ -366,7 +366,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
     bottom_left_block = {"x": blockx-1, "y": blocky+1}
     
     blocks = [right_block, left_block, down_block, up_block, top_right_block, 
-             top_left_block, bottom_right_block, bottom_left_block]
+              top_left_block, bottom_right_block, bottom_left_block]
     
     count = 0           # a weighted measurement of the block priority
       
@@ -378,10 +378,10 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
     # better counting is key
     
     if (block in food):
-        count += 2
+        count += 3
         
     for block1 in blocks: 
-        count += zone_check(block1, snakes, max)
+        count += zone_check(block1, snakes, max, head)
     
     
     for tail in tails:
@@ -405,7 +405,9 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
 # dict, list -> int
 # takes a block and checks if any snake is 
 # in this block or not
-def zone_check(block, snakes, max):
+def zone_check(block, snakes, max, head):
+    if (block == head): 
+        return 0
     if (block in snakes): 
         return -1
     if (block not in snakes):
@@ -435,7 +437,7 @@ def zone_check_heads(block, head, ownsize, sizes, counter):
 # takes a block and checks if food is in it or not
 def zone_check_food(block, item):
     if (block == item):
-        return 2
+        return 3
     return 0
     
 # string, dict, dict, dict, dict -> dict
