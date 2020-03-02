@@ -274,13 +274,20 @@ def body_sensor(lod, head, snakes, max, food, ownsize):
     
     # removing isntanst death options
     if (right_block in snakes and "right" in lod):  
-        lod.remove("right")
+        if (right_block not in tails): 
+            lod.remove("right")
+            
     if (left_block in snakes and "left" in lod):
-        lod.remove("left")    
+        if (left_block not in tails):
+            lod.remove("left")  
+            
     if (down_block in snakes and "down" in lod):
-        lod.remove("down")       
+        if (down_block not in tails):
+            lod.remove("down")       
+            
     if (up_block in snakes and "up" in lod):
-        lod.remove("up")
+        if (up_block not in tails):
+            lod.remove("up")
         
     if (len(lod) != 0):                 
         if (len(lod) == 1):
