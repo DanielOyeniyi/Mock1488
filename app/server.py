@@ -377,7 +377,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food,
     # can I use the same method I used to target food to tartget heads?
     # better counting is key
     
-    if (block in food):
+    if (block in food): # this is the line that might have broke the snake
         count += 7
         
     for block1 in blocks: 
@@ -434,9 +434,9 @@ def zone_check_tails(block, tail):
 def zone_check_heads(block, head, ownsize, sizes, counter):
     if (ownsize > sizes[counter]):
         if (block == head):
-            return 5
+            return 8
     if (block == head):
-        return -5
+        return -8
     return 0
     
 # dict, dict -> int
