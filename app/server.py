@@ -83,58 +83,58 @@ def next_move(data):
     if (head["x"] == 0 and head["y"] == 0):            # top left corner 
         directions = ["down", "right"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
         
     elif (head["x"] == max and head["y"] == 0):        # top right corner 
         directions = ["down", "left"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
         
     elif (head["x"] == max and head["y"] == max):      # bottom right corner 
         directions = ["up", "left"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
         
     elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
         directions = ["up", "right"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
 
 
     elif (head["x"] == 0):                             # left wall
         directions = ["up", "down","right"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
         
     elif (head["y"] == 0):                             # top wall 
         directions = ["down", "left","right"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
 
     elif (head["x"] == max):                           # right wall 
         directions = ["up", "down","left"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
         
         
     elif (head["y"] == max):                           # bottom wall
         directions = ["up", "left","right"]
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
 
 
     else:
         directions = ["up", "down", "left", "right"]   # middle of board
         safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food)
+        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
     
 # list, list, dict, int, list, int  
-def chase_or_feast(lod, snakes, head, ownsize, food):
+def chase_or_feast(lod, snakes, head, ownsize, food, body):
     headx = head["x"]
     heady = head["y"]
     sizes = make_sizes(snakes)
@@ -142,14 +142,15 @@ def chase_or_feast(lod, snakes, head, ownsize, food):
     
     target = []
     for snake in snakes:
-        body = snake["body"]
-        snake_head = body[0]
+        snake_body = snake["body"]
+        snake_head = snake_body[0]
         x = abs(snake_head["x"] - headx)
         y = abs(snake_head["y"] - heady)
         distance = x + y
         if (distance < nearest):
-            nearest = distance 
-            target = snake_head
+            if (snake_body != body):
+                nearest = distance 
+                target = snake_head
             
             
     if (len(target) != 0):
