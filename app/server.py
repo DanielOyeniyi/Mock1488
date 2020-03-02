@@ -434,9 +434,9 @@ def zone_check_tails(block, tail):
 def zone_check_heads(block, head, ownsize, sizes, counter):
     if (ownsize > sizes[counter]):
         if (block == head):
-            return 8
+            return 20
     if (block == head):
-        return -8
+        return -20
     return 0
     
 # dict, dict -> int
