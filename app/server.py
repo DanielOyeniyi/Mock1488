@@ -405,11 +405,13 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food)
 # takes a block and checks if any snake is 
 # in this block or not
 def zone_check(block, snakes, max):
+    if (block in snakes): 
+        return -1
     if (block not in snakes):
         if (block["x"] != max+1 and block["x"] != -1):
             if (block["y"] != max+1 and block["y"] != -1):
                 return 1 
-    return -1
+    return 0
     
 # dict, dict -> int
 # takes a block and checks if tail is in it or not
