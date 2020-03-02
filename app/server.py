@@ -378,7 +378,7 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food,
     # better counting is key
     
     if (block in food):
-        count += 3
+        count += 7
         
     for block1 in blocks: 
         count += zone_check(block1, snakes, max, head)
@@ -393,6 +393,12 @@ def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food,
         for block1 in blocks:
             count += zone_check_heads(block1, head, ownsize, sizes, counter)
         counter += 1
+    
+    for item in food: 
+        for block1 in blocks: 
+            if (block1 == right_block or block1 == left_block or block1 == down_block or block1 == up_block):
+                count += zone_check_food(block1, item)
+            count += zone_check_food2(block1, item)
     
     if (block["x"] == -1 or block["x"] == max+1):
         count -= 1
@@ -438,6 +444,13 @@ def zone_check_heads(block, head, ownsize, sizes, counter):
 def zone_check_food(block, item):
     if (block == item):
         return 3
+    return 0
+    
+# dict, dict -> int
+# takes a block and checks if food is in it or not
+def zone_check_food2(block, item):
+    if (block == item):
+        return 1
     return 0
     
 # string, dict, dict, dict, dict -> dict
