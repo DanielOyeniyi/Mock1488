@@ -96,35 +96,36 @@ def hungry(directions, food, head):
     if (len(directions) != 0):
         return random.choice(directions)
     return "up"  
+ 
 
 # list, list, dict -> string
 # takes a list of possible directions and 
 # picks a direction that will goes towards food
 def target(data, head, directions):
-    path = 100   
-    nearest = {}
+    
+
     heads = make_enemy_heads(data, head)
     sizes = make_sizes(data)
     own_size = len(data["you"]["body"])
+    target = {}
+    sizing = 0
     
     counter = 0
-    for target in heads: 
+    for head in heads: 
         if (own_size > sizes[counter]):
-            x = abs(target["x"] - head["x"])
-            y = abs(target["y"] - head["y"])
-            distance = x + y 
-            if (distance < path):
-                path = distance
-                nearest = target
+            difference= own_size - sizes[counter]
+            if (difference > sizing):
+                sizing = difference
+                target = head
     
-    if (len(nearest) != 0):
-        if (head["y"] < nearest["y"] and "down" in directions):
+    if (len(target) != 0):
+        if (head["y"] < target["y"] and "down" in directions):
                 return "down"
-        if (head["y"] < nearest["y"] and "up" in directions):
+        if (head["y"] < target["y"] and "up" in directions):
                 return "up"
-        if (head["x"] < nearest["x"] and "right" in directions):
+        if (head["x"] < target["x"] and "right" in directions):
                 return "right"
-        if (head["x"] > nearest["x"] and "left" in directions):
+        if (head["x"] > target["x"] and "left" in directions):
                 return "left"
     return hungry(directions, data["board"]["food"], head)
 
