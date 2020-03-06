@@ -74,6 +74,8 @@ def next_move(data):
 # picks a direction that will goes towards food
 def hungry(directions, food, head):
     path = 100   
+    pathx = 100
+    pathy = 100
     nearest = {}
     
     for item in food: 
@@ -82,17 +84,69 @@ def hungry(directions, food, head):
         distance = x + y 
         if (distance < path):
             path = distance
+            pathx = x
+            pathy = y
             nearest = item
             
             
-    if (head["y"] < nearest["y"] and "up" in directions):
-            return "up"
-    if (head["y"] < nearest["y"] and "down" in directions):
+            
+            
+    if (head["x"] <= nearest["x"] and head["y"] <= nearest["y"]):
+        if ("right" in directions and "down" in directions):
+            if (pathx > pathy):
+                return "right"
+            if (pathx < pathy):
+                return "down" 
+            return random.choice(["right", "down"])
+            
+        if ("down" in directions):  
             return "down"
-    if (head["x"] < nearest["x"] and "right" in directions):
+            
+        if ("right" in directions):
             return "right"
-    if (head["x"] > nearest["x"] and "left" in directions):
+        
+    if (head["x"] <= nearest["x"] and head["y"] >= nearest["y"]):
+        if ("right" in directions and "up" in directions):
+            if (pathx > pathy):
+                return "right"
+            if (pathx < pathy):
+                return "up" 
+            return random.choice(["right", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("right" in directions):
+            return "right"
+            
+    if (head["x"] >= nearest["x"] and head["y"] <= nearest["y"]):
+        if ("left" in directions and "down" in directions):
+            if (pathx > pathy):
+                return "left"
+            if (pathx < pathy):
+                return "down" 
+            return random.choice(["left", "down"])
+            
+        if ("down" in directions):  
+            return "down"
+            
+        if ("left" in directions):
             return "left"
+            
+    if (head["x"] >= nearest["x"] and head["y"] >= nearest["y"]):
+        if ("left" in directions and "up" in directions):
+            if (pathx > pathy):
+                return "left"
+            if (pathx < pathy):
+                return "up" 
+            return random.choice(["left", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("left" in directions):
+            return "left"
+            
     if (len(directions) != 0):
         return random.choice(directions)
     return "up"  
