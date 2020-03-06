@@ -186,7 +186,9 @@ def pathing(data, head, target, directions, pathX, pathY):
             
         if ("left" in directions):
             return "left"
-    return chase_tail(data, head, directions)
+    if (len(directions) != 0):
+        return chase_tail(data, head, directions)
+    return "up"
 
 # dict , int, int-> list
 # takes a list representing a block on the map and 
