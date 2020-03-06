@@ -90,7 +90,7 @@ def hungry(directions, food, head):
             
             
             
-            
+            # make into a method 
     if (head["x"] <= nearest["x"] and head["y"] <= nearest["y"]):
         if ("right" in directions and "down" in directions):
             if (pathx > pathy):
@@ -161,25 +161,76 @@ def target(data, head, directions):
     heads = make_enemy_heads(data, head)
     sizes = make_sizes(data)
     own_size = len(data["you"]["body"])
-    target = {}
+    nearest = {}
+    pathx = 100
+    pathy = 100
     sizing = 0
     
     counter = 0
-    for head in heads: 
+    for bad_head in heads: 
         if (own_size > sizes[counter]):
-            difference= own_size - sizes[counter]
+            difference = own_size - sizes[counter]
+            x = abs(bad_head["x"] - head["x"])
+            y = abs(bad_head["y"] - head["y"])
             if (difference > sizing):
                 sizing = difference
-                target = head
+                nearest = bad_head
     
-    if (len(target) != 0):
-        if (head["y"] < target["y"] and "down" in directions):
+    if (len(nearest) != 0):
+        if (head["x"] <= nearest["x"] and head["y"] <= nearest["y"]):
+            if ("right" in directions and "down" in directions):
+                if (pathx > pathy):
+                    return "right"
+                if (pathx < pathy):
+                    return "down" 
+                return random.choice(["right", "down"])
+                
+            if ("down" in directions):  
                 return "down"
-        if (head["y"] < target["y"] and "up" in directions):
-                return "up"
-        if (head["x"] < target["x"] and "right" in directions):
+                
+            if ("right" in directions):
                 return "right"
-        if (head["x"] > target["x"] and "left" in directions):
+            
+        if (head["x"] <= nearest["x"] and head["y"] >= nearest["y"]):
+            if ("right" in directions and "up" in directions):
+                if (pathx > pathy):
+                    return "right"
+                if (pathx < pathy):
+                    return "up" 
+                return random.choice(["right", "up"])
+                
+            if ("up" in directions):  
+                return "up"
+                
+            if ("right" in directions):
+                return "right"
+                
+        if (head["x"] >= nearest["x"] and head["y"] <= nearest["y"]):
+            if ("left" in directions and "down" in directions):
+                if (pathx > pathy):
+                    return "left"
+                if (pathx < pathy):
+                    return "down" 
+                return random.choice(["left", "down"])
+                
+            if ("down" in directions):  
+                return "down"
+                
+            if ("left" in directions):
+                return "left"
+                
+        if (head["x"] >= nearest["x"] and head["y"] >= nearest["y"]):
+            if ("left" in directions and "up" in directions):
+                if (pathx > pathy):
+                    return "left"
+                if (pathx < pathy):
+                    return "up" 
+                return random.choice(["left", "up"])
+                
+            if ("up" in directions):  
+                return "up"
+                
+            if ("left" in directions):
                 return "left"
     return hungry(directions, data["board"]["food"], head)
 
