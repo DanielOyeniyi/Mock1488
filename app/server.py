@@ -19,8 +19,6 @@ def ping():
     return HTTPResponse(status=200)
 
 
-
-# only works for one game at a time
 @bottle.post("/start")
 def start():
     """
@@ -30,7 +28,7 @@ def start():
     data = bottle.request.json
     print("START:", json.dumps(data))
 
-    response = {"color": "#00FF7F", "headType": "bendr", "tailType": "round-bum"}
+    response = {"color": "#F08080", "headType": "safe", "tailType": "hook"}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
@@ -46,432 +44,434 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    print("MOVE:", json.dumps(data)) # just raw text... move is irrelavent
-    
-    # try and remember past moves (with size being snake length)
-    shout = "I am a python snake!"
-    
+    print("MOVE:", json.dumps(data))
+
+    # Choose a random direction to move in
+    directions = ["up", "down", "left", "right"]
     move = next_move(data)
+
+    # Shouts are messages sent to all the other snakes in the game.
+    # Shouts are not displayed on the game board.
+    shout = "I am a python snake!"
+
     response = {"move": move, "shout": shout}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
         body=json.dumps(response),
     )
-    # create seperate files classes
-    # (0,0) is top left
-    
 
-# dict -> string
-# takes a dict containg board info and produces a direction
 def next_move(data):
-    turn = data["turn"]                      # turn is a int representign the turn in game
-    you = data["you"]                        # you is a dict representing your snakes data
-    board = data["board"]                    # board is a dict representing the game board info
-    snakes = board["snakes"]                 # locations of occupied spots on the board
-    food = board["food"]                     # locations of food on the board
-    body = you["body"]                       # body is a list of dicts representing your snakes location
-    ownsize = len(body)                      # size of your own snake
-    health = you["health"]                   # health of the snake
-    head = body[0]                           # head is a dict representing your snakes head
-    max = board["height"]                    # max is the dimention number e.g. 14 by 14
-    max -= 1
+
+    head = data["you"]["body"][0]
+    directions = optimal_directions(data)
+    directions = avoid_heads(data, head, directions)
     
-    # you could use less parameters if you just sent the board
-    # yeah, it would be way easier to read, it makes more sense
-    
-    if (head["x"] == 0 and head["y"] == 0):            # top left corner 
-        directions = ["down", "right"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-        
-    elif (head["x"] == max and head["y"] == 0):        # top right corner 
-        directions = ["down", "left"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-        
-    elif (head["x"] == max and head["y"] == max):      # bottom right corner 
-        directions = ["up", "left"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-        
-    elif (head["x"] == 0 and head["y"] == max):        # bottom left corner
-        directions = ["up", "right"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
+    return target(data, head, directions)
 
-
-    elif (head["x"] == 0):                             # left wall
-        directions = ["up", "down","right"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-        
-    elif (head["y"] == 0):                             # top wall 
-        directions = ["down", "left","right"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-
-    elif (head["x"] == max):                           # right wall 
-        directions = ["up", "down","left"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-        
-        
-    elif (head["y"] == max):                           # bottom wall
-        directions = ["up", "left","right"]
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-
-
-    else:
-        directions = ["up", "down", "left", "right"]   # middle of board
-        safe_directions = body_sensor(directions, head, snakes, max, food, ownsize)
-        return chase_or_feast(safe_directions, snakes, head, ownsize, food, body)
-    
-# list, list, dict, int, list, int  
-def chase_or_feast(lod, snakes, head, ownsize, food, body):
-    headx = head["x"]
-    heady = head["y"]
-    sizes = make_sizes(snakes)
-    nearest = 100
-    
-    target = []
-    for snake in snakes:
-        snake_body = snake["body"]
-        snake_head = snake_body[0]
-        x = abs(snake_head["x"] - headx)
-        y = abs(snake_head["y"] - heady)
-        distance = x + y
-        if (distance < nearest):
-            if (snake_body != body):
-                nearest = distance 
-                target = snake_head
-            
-            
-    if (len(target) != 0):
-        if (headx > target["x"]):
-            if ("left" in lod):
-                return "left"
-        if (headx < target["x"]):
-            if ("right" in lod):
-                return "right"
-        if (heady > target["y"]):
-            if ("up" in lod):
-                return "up"
-        if (heady < target["y"]):
-            if ("down" in lod):
-                return "down"
-
-    if (len(lod) != 0):
-        return eat_food(lod, food, head)
-    else: 
-        print("Uh oh...")
-        return "up"
-    
-
-# list, list -> string
+# list, list, dict -> string
 # takes a list of possible directions and 
-# picks a direction that will go towards food
-def eat_food(lod, food, head):
-    headx = head["x"]
-    heady = head["y"]
-    
- 
-    nearest = 100   
-    food1 = []
+# picks a direction that will goes towards food
+def hungry(directions, food, head):
+    path = 100   
+    nearest = {}
     
     for item in food: 
-        x = abs(item["x"] - headx)
-        y = abs(item["y"] - heady)
+        x = abs(item["x"] - head["x"])
+        y = abs(item["y"] - head["y"])
         distance = x + y 
-        if (distance < nearest):
-            nearest = distance
-            food1 = item
+        if (distance < path):
+            path = distance
+            nearest = item
             
-
-    if (headx > food1["x"]):
-        if ("left" in lod):
-            return "left"
-    if (headx < food1["x"]):
-        if ("right" in lod):
+    if (head["x"] < nearest["x"] and "right" in directions):
             return "right"
-    if (heady > food1["y"]):
-        if ("up" in lod):
-            return "up"
-    if (heady < food1["y"]):
-        if ("down" in lod):
+    if (head["x"] > nearest["x"] and "left" in directions):
+            return "left"
+    if (head["y"] < nearest["y"] and "down" in directions):
             return "down"
+    if (head["y"] < nearest["y"] and "up" in directions):
+            return "up"
+    if (len(directions) != 0):
+        return random.choice(directions)
+    return "up"  
 
-    if (len(lod) != 0):
-        return random.choice(lod)
-    else: 
-        print("Uh oh...")
-        return "up"
-
-
-# list -> list
-# makes a list of all the occupied spots on the map
-def make_occupied(snakes):
-    occupied = []
-    for snake in snakes:
-        body = snake["body"]
-        for block in body: 
-            occupied.append(block)
-    return occupied
+# list, list, dict -> string
+# takes a list of possible directions and 
+# picks a direction that will goes towards food
+def target(data, head, directions):
+    path = 100   
+    nearest = {}
+    heads = make_enemy_heads(data, head)
+    sizes = make_sizes(data)
+    own_size = len(data["you"]["body"])
     
-# list -> list
-# makes a list of all the tails on the board
-def make_tails(snakes): 
-    tails = []
-    for snake in snakes: 
-        body = snake["body"]
-        tails.append(body[-1])
-    return tails
-  
-# list -> list
-# makes a list of all the heads on the board
-def make_heads(snakes): 
+    counter = 0
+    for target in heads: 
+        if (own_size > sizes[counter]):
+            x = abs(target["x"] - head["x"])
+            y = abs(target["y"] - head["y"])
+            distance = x + y 
+            if (distance < path):
+                path = distance
+                nearest = target
+    
+    if (len(nearest) != 0):
+        if (head["x"] < nearest["x"] and "right" in directions):
+                return "right"
+        if (head["x"] > nearest["x"] and "left" in directions):
+                return "left"
+        if (head["y"] < nearest["y"] and "down" in directions):
+                return "down"
+        if (head["y"] < nearest["y"] and "up" in directions):
+                return "up"
+    return hungry(directions, data["board"]["food"], head)
+
+# dict , int, int-> list
+# takes a list representing a block on the map and 
+# returns a list of available directions
+def avoid_heads(data, head, directions):
+    right_block = {"x": head["x"] + 1, "y": head["y"]}
+    left_block = {"x": head["x"] - 1, "y": head["y"]}
+    down_block = {"x": head["x"], "y": head["y"] + 1}
+    up_block = {"x": head["x"], "y": head["y"] - 1}
+    
+    snakes = make_snakes(data)
+    tails = make_tails(data)
+    enemy_heads = make_enemy_heads(data, head)
+    
+    if (check_around(data, right_block, enemy_heads) != True and "right" in directions):
+        directions.remove("right")
+    if (check_around(data, left_block, enemy_heads) != True and "left" in directions):
+        directions.remove("left")
+    if (check_around(data, down_block, enemy_heads) != True and "down" in directions):
+        directions.remove("down")
+    if (check_around(data, up_block, enemy_heads) != True and "up" in directions):
+        directions.remove("up")
+
+    if (len(directions)==0):
+        directions = optimal_directions_tails(data)
+        if (check_around(data, right_block, enemy_heads) != True and "right" in directions):
+            directions.remove("right")
+        if (check_around(data, left_block, enemy_heads) != True and "left" in directions):
+            directions.remove("left")
+        if (check_around(data, down_block, enemy_heads) != True and "down" in directions):
+            directions.remove("down")
+        if (check_around(data, up_block, enemy_heads) != True and "up" in directions):
+            directions.remove("up")
+
+    if (len(directions)==0):
+        if (right_block in tails):
+            directions.append("right") 
+        if (left_block in tails):
+            directions.append("left")
+        if (down_block in tails):
+            directions.append("down")
+        if (up_block in tails):
+            directions.append("up")
+            
+    if (len(directions)==0):
+        if (check_around_surrounded(data, right_block, enemy_heads) != True and right_block not in snakes):
+            directions.append("right")
+        if (check_around_surrounded(data, left_block, enemy_heads) != True and left_block not in snakes):
+            directions.append("left")
+        if (check_around_surrounded(data, down_block, enemy_heads) != True and down_block not in snakes):
+            directions.append("down")
+        if (check_around_surrounded(data, up_block, enemy_heads) != True and up_block not in snakes):
+            directions.append("up")
+        
+    if (len(directions)==0):
+        if (check_around(data, right_block, enemy_heads) != True and right_block not in snakes):
+            directions.append("right")
+        if (check_around(data, left_block, enemy_heads) != True and left_block not in snakes):
+            directions.append("left")
+        if (check_around(data, down_block, enemy_heads) != True and down_block not in snakes):
+            directions.append("down")
+        if (check_around(data, up_block, enemy_heads) != True and up_block not in snakes):
+            directions.append("up")
+    return directions
+
+# dict, list -> bool
+# takes a dicts and returns true if the block is safe
+# returns false if the block is dangerous
+def check_around(data, block, heads):
+    right_block = {"x": block["x"]+1, "y": block["y"]}
+    left_block = {"x": block["x"]-1, "y": block["y"]}
+    down_block = {"x": block["x"], "y": block["y"]+1}
+    up_block = {"x": block["x"], "y": block["y"]-1}
+    
+    own_size = len(data["you"]["body"])
+    sizes = make_sizes(data)
+    heads = make_enemy_heads(data, data["you"]["body"][0])
+    
+    # makes it so that if you are surrounded, go towards the snake
+    # that is of equal size
+    
+    safe = True 
+    counter = 0
+    for head in heads:
+        if (own_size <= sizes[counter]):
+            if (right_block == head):
+                safe = False
+            if (left_block == head):
+                safe = False
+            if (down_block == head):
+                safe = False
+            if (up_block == head):
+                safe = False
+        counter += 1
+    return safe
+    
+# dict, list -> bool
+# takes a dicts and returns true if the block is safe
+# returns false if the block is dangerous
+def check_around_surrounded(data, block, heads):
+    right_block = {"x": block["x"]+1, "y": block["y"]}
+    left_block = {"x": block["x"]-1, "y": block["y"]}
+    down_block = {"x": block["x"], "y": block["y"]+1}
+    up_block = {"x": block["x"], "y": block["y"]-1}
+    
+    own_size = len(data["you"]["body"])
+    sizes = make_sizes(data)
+    heads = make_enemy_heads(data, data["you"]["body"][0])
+    
+    # makes it so that if you are surrounded, go towards the snake
+    # that is of equal size
+    
+    safe = True 
+    counter = 0
+    for head in heads:
+        if (own_size == sizes[counter]):
+            if (right_block == head):
+                safe = False
+            if (left_block == head):
+                safe = False
+            if (down_block == head):
+                safe = False
+            if (up_block == head):
+                safe = False
+        counter += 1
+    return safe
+    
+checked = []
+def optimal_directions(data):
+    head = data["you"]["body"][0]
+    snakes = make_snakes(data)
+    
+    right_block = {"x": head["x"] + 1, "y": head["y"]}
+    left_block = {"x": head["x"] - 1, "y": head["y"]}
+    down_block = {"x": head["x"], "y": head["y"] + 1}
+    up_block = {"x": head["x"], "y": head["y"] - 1}
+    
+    checked.clear()
+    right = links(data, head, snakes, "right")
+    checked.clear()
+    left = links(data, head, snakes, "left")
+    checked.clear()
+    down = links(data, head, snakes, "down")
+    checked.clear()
+    up = links(data, head, snakes, "up")
+    
+    values = [right, left, down, up]
+    values.sort(reverse=True)
+    directions = []
+    
+    for num in range(4):
+        if (values[num] == right and "right" not in directions):
+            directions.append("right")
+        if (values[num] == left and "left" not in directions):
+            directions.append("left")
+        if (values[num] == down and "down" not in directions):
+            directions.append("down")
+        if (values[num] == up and "up" not in directions):
+            directions.append("up")
+    
+    
+    if (values[0] > values[1]):
+        return [directions[0]]
+    if (values[0] > values[2]):
+        return [directions[0], directions[1]]
+    if (values[0] > values[3]):
+        return [directions[0], directions[1], directions[2]]
+    return directions  
+   
+def links(data, block, snakes, direction):
+    counter = 0
+    if (direction == "right"):
+        counter += links_v2(data, block, snakes, "right", 0)
+        
+    if (direction == "left"):
+        counter += links_v2(data, block, snakes, "left", 0)
+    
+    if (direction == "down"):
+        counter += links_v2(data, block, snakes, "down", 0)
+    
+    if (direction == "up"):
+        counter += links_v2(data, block, snakes, "up", 0)
+    return counter     
+
+def links_v2(data, block, snakes, direction, count):
+    right_block = {"x": block["x"] + 1, "y": block["y"]}
+    left_block = {"x": block["x"] - 1, "y": block["y"]}
+    down_block = {"x": block["x"], "y": block["y"] + 1}
+    up_block = {"x": block["x"], "y": block["y"] - 1}
+    
+    
+    if (direction == "right"):
+        if (right_block in snakes or right_block["x"] == data["board"]["width"] or right_block in checked):
+            return count
+        checked.append(right_block)
+        return links_v2(data, right_block, snakes, direction, count + 1) + links(data, right_block, snakes, "down") + links(data, right_block, snakes, "up")
+        
+    if (direction == "left"):
+        if (left_block in snakes or left_block["x"] == -1 or left_block in checked):
+            return count
+        checked.append(left_block)
+        return links_v2(data, left_block, snakes, direction, count + 1) + links(data, left_block, snakes, "down") + links(data, left_block, snakes, "up")
+        
+    if (direction == "down"):
+        if (down_block in snakes or down_block["y"] == data["board"]["height"] or down_block in checked):
+            return count
+        checked.append(down_block)
+        return links_v2(data, down_block, snakes, direction, count + 1)  + links(data, down_block, snakes, "right") + links(data, down_block, snakes, "left")
+        
+    if (direction == "up"):
+        if (up_block in snakes or up_block["y"] == -1 or up_block in checked):
+            return count
+        checked.append(up_block)
+        return links_v2(data, up_block, snakes, direction, count + 1) + links(data, up_block, snakes, "right") + links(data, up_block, snakes, "left")
+
+def optimal_directions_tails(data):
+    head = data["you"]["body"][0]
+    snakes = make_snakes(data)
+    
+    right_block = {"x": head["x"] + 1, "y": head["y"]}
+    left_block = {"x": head["x"] - 1, "y": head["y"]}
+    down_block = {"x": head["x"], "y": head["y"] + 1}
+    up_block = {"x": head["x"], "y": head["y"] - 1}
+    
+    checked.clear()
+    right = links_tails(data, head, snakes, "right")
+    checked.clear()
+    left = links_tails(data, head, snakes, "left")
+    checked.clear()
+    down = links_tails(data, head, snakes, "down")
+    checked.clear()
+    up = links_tails(data, head, snakes, "up")
+    
+    values = [right, left, down, up]
+    values.sort(reverse=True)
+    directions = []
+    
+    for num in range(4):
+        if (values[num] == right and "right" not in directions):
+            directions.append("right")
+        if (values[num] == left and "left" not in directions):
+            directions.append("left")
+        if (values[num] == down and "down" not in directions):
+            directions.append("down")
+        if (values[num] == up and "up" not in directions):
+            directions.append("up")
+    
+    
+    if (values[0] > values[1]):
+        return [directions[0]]
+    if (values[0] > values[2]):
+        return [directions[0], directions[1]]
+    if (values[0] > values[3]):
+        return [directions[0], directions[1], directions[2]]
+    return directions
+
+def links_tails(data, block, snakes, direction):
+    counter = 0
+    if (direction == "right"):
+        counter += links_v2_tails(data, block, snakes, "right", 0)
+        
+    if (direction == "left"):
+        counter += links_v2_tails(data, block, snakes, "left", 0)
+    
+    if (direction == "down"):
+        counter += links_v2_tails(data, block, snakes, "down", 0)
+    
+    if (direction == "up"):
+        counter += links_v2_tails(data, block, snakes, "up", 0)
+    return counter 
+
+def links_v2_tails(data, block, snakes, direction, count):
+    right_block = {"x": block["x"] + 1, "y": block["y"]}
+    left_block = {"x": block["x"] - 1, "y": block["y"]}
+    down_block = {"x": block["x"], "y": block["y"] + 1}
+    up_block = {"x": block["x"], "y": block["y"] - 1}
+    
+    tails = make_tails(data)
+    
+    
+    if (direction == "right"):
+        if ((right_block in snakes or right_block["x"] == data["board"]["width"] or right_block in checked) and right_block not in tails):
+            return count
+        checked.append(right_block)
+        return links_v2_tails(data, right_block, snakes, direction, count + 1) + links_tails(data, right_block, snakes, "down") + links_tails(data, right_block, snakes, "up")
+        
+    if (direction == "left"):
+        if ((left_block in snakes or left_block["x"] == -1 or left_block in checked) and left_block not in tails):
+            return count
+        checked.append(left_block)
+        return links_v2_tails(data, left_block, snakes, direction, count + 1) + links_tails(data, left_block, snakes, "down") + links_tails(data, left_block, snakes, "up")
+        
+    if (direction == "down"):
+        if ((down_block in snakes or down_block["y"] == data["board"]["height"] or down_block in checked) and down_block not in tails):
+            return count
+        checked.append(down_block)
+        return links_v2_tails(data, down_block, snakes, direction, count + 1)  + links_tails(data, down_block, snakes, "right") + links_tails(data, down_block, snakes, "left")
+        
+    if (direction == "up"):
+        if ((up_block in snakes or up_block["y"] == -1 or up_block in checked) and up_block not in tails):
+            return count
+        checked.append(up_block)
+        return links_v2_tails(data, up_block, snakes, direction, count + 1) + links_tails(data, up_block, snakes, "right") + links_tails(data, up_block, snakes, "left")
+    
+def make_snakes(data):
+    snakes = []
+    for snake in data["board"]["snakes"]:
+        for part in snake["body"]:
+            snakes.append(part)
+    return snakes
+    
+# list, list -> list
+# makes a list of enemy snake heads 
+def make_heads(data):
     heads = []
-    for snake in snakes: 
-        body = snake["body"]
-        heads.append(body[0])
+    for snake in data["board"]["snakes"]:
+        heads.append(snake["body"][0])
+    return heads
+    
+# list, list -> list
+# makes a list of enemy snake heads 
+def make_enemy_heads(data, head):
+    heads = []
+    for snake in data["board"]["snakes"]:
+        if (snake["body"][0] != head):
+            heads.append(snake["body"][0])
     return heads
 
 # list -> list
+# makes a list of tails
+def make_tails(data):
+    tails = []
+    for snake in data["board"]["snakes"]: 
+        tails.append(snake["body"][-1])
+    return tails
+    
+# list -> list
 # makes a list of all the snakes sizes
-def make_sizes(snakes): 
+def make_sizes(data): 
     sizes = []
-    for snake in snakes: 
+    for snake in data["board"]["snakes"]: 
         body = snake["body"]
         size = len(body)
         sizes.append(size)
     return sizes
-
-
-# list, list, int -> string
-# should sense the possible options and pick the ones
-# that won't result in instant death
-def body_sensor(lod, head, snakes, max, food, ownsize):
-    headx = head["x"]
-    heady = head["y"]
-    tails = make_tails(snakes)
-    heads = make_heads(snakes)
-    heads.remove(head)
-    sizes = make_sizes(snakes)
-    snakes = make_occupied(snakes)
     
-    
-    right_block = {"x": headx+1, "y": heady}    
-    left_block = {"x": headx-1, "y": heady}      
-    down_block = {"x": headx, "y": heady+1}   
-    up_block = {"x": headx, "y": heady-1}    
-    
-    
-    # removing isntanst death options
-    if (right_block in snakes and "right" in lod):  
-        if (right_block not in tails): 
-            lod.remove("right")
-            
-    if (left_block in snakes and "left" in lod):
-        if (left_block not in tails):
-            lod.remove("left")  
-            
-    if (down_block in snakes and "down" in lod):
-        if (down_block not in tails):
-            lod.remove("down")       
-            
-    if (up_block in snakes and "up" in lod):
-        if (up_block not in tails):
-            lod.remove("up")
-        
-    if (len(lod) != 0):                 
-        if (len(lod) == 1):
-            return lod
-            
-        elif (len(lod) == 2):   
-            block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
-            block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
-            
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food, head)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food, head)
-            
-            if (choice1 > choice2):
-                del lod[1]
-                return lod
-            elif (choice2 > choice1):
-                del lod[0]
-                return lod
-            else:                                      
-                return lod
-            
-        elif (len(lod) == 3):
-            block1 = block_picker(lod[0], right_block, left_block, down_block, up_block)
-            block2 = block_picker(lod[1], right_block, left_block, down_block, up_block)
-            block3 = block_picker(lod[2], right_block, left_block, down_block, up_block)
-            
-            choice1 = advanced_body_sensor(block1, snakes, tails, heads, sizes, ownsize, max, food, head)
-            choice2 = advanced_body_sensor(block2, snakes, tails, heads, sizes, ownsize, max, food, head)
-            choice3 = advanced_body_sensor(block3, snakes, tails, heads, sizes, ownsize, max, food, head)
-            
-            if (choice1 > choice2 and choice1 > choice3):     # choice1 is biggest
-                del lod[2]
-                del lod[1]
-                return lod    
-                
-            elif (choice2 > choice1 and choice2 > choice3):   # choice2 is biggest
-                del lod[2]
-                del lod[0]
-                return lod    
-                
-            elif (choice3 > choice1 and choice3 > choice2):   # choice3 is biggest
-                del lod[1]
-                del lod[0]
-                return lod   
-                
-            elif (choice1 == choice2 and choice1 > choice3):  # choice1 & choice2 are equal, & greater than choice3 
-                del lod[2]
-                return lod
-                
-            elif (choice1 == choice3 and choice1 > choice2):  # choice1 & choice3 are equal, & greater than choice2 
-                del lod[1]
-                return lod 
-                
-            elif (choice2 == choice3 and choice2 > choice1):  # choice2 & choice3 are equal, & greater than choice1
-                del lod[0]
-                return lod        
-                
-            else:                                             # they are all equal                    
-                return lod
-            
-        else:
-            return lod
-    else: 
-        return []
- 
-# dict, list, list, list, int, int, list -> int
-# takes the block and returns the # of options
-# the snake has in this block
-def advanced_body_sensor(block, snakes, tails, heads, sizes, ownsize, max, food, head):  # can we make it check even more possibilities?
-    blockx = block["x"]
-    blocky = block["y"]
-    
-    # reachable directions
-    right_block = {"x": blockx+1, "y": blocky} 
-    left_block = {"x": blockx-1, "y": blocky}
-    down_block = {"x": blockx, "y": blocky+1}
-    up_block = {"x": blockx, "y": blocky-1}             
-
-    # unreachable(diagonal) directions
-    top_right_block = {"x": blockx+1, "y": blocky-1}
-    top_left_block = {"x": blockx-1, "y": blocky-1}
-    bottom_right_block = {"x": blockx+1, "y": blocky+1}
-    bottom_left_block = {"x": blockx-1, "y": blocky+1}
-    
-    blocks = [right_block, left_block, down_block, up_block, top_right_block, 
-              top_left_block, bottom_right_block, bottom_left_block]
-    
-    count = 0           # a weighted measurement of the block priority
-      
-    # now case like, don't be agressive if you are close to walls or something
-    # e.g. don't chase if your body and another head are in the way
-    # go along your body rather than pathing in tight spots to give self room 
-    # smaller board makes you focus on proper pathing
-    # can I use the same method I used to target food to tartget heads?
-    # better counting is key
-    
-    if (block in food): # this is the line that might have broke the snake
-        count += 7
-        
-    for block1 in blocks: 
-        count += zone_check(block1, snakes, max, head)
-    
-    
-    for tail in tails:
-        for block1 in blocks: 
-            count += zone_check_tails(block1, tail)
-
-    counter = 0
-    for head in heads:                  # look to kill if bigger, run away if smaller
-        for block1 in blocks:
-            count += zone_check_heads(block1, head, ownsize, sizes, counter)
-        counter += 1
-    
-    for item in food: 
-        for block1 in blocks: 
-            if (block1 == right_block or block1 == left_block or block1 == down_block or block1 == up_block):
-                count += zone_check_food(block1, item)
-            count += zone_check_food2(block1, item)
-    
-    if (block["x"] == -1 or block["x"] == max+1):
-        count -= 1
-    if (block["y"] == -1 or block["y"] == max+1):
-        count -= 1
-    
-    print(count)
-    return count
-
-# dict, list -> int
-# takes a block and checks if any snake is 
-# in this block or not
-def zone_check(block, snakes, max, head):
-    if (block == head): 
-        return 0
-    if (block in snakes): 
-        return -1
-    if (block not in snakes):
-        if (block["x"] != max+1 and block["x"] != -1):
-            if (block["y"] != max+1 and block["y"] != -1):
-                return 1 
-    return 0
-    
-# dict, dict -> int
-# takes a block and checks if tail is in it or not
-def zone_check_tails(block, tail):
-    if (block == tail):
-        return 1
-    return 0
-    
-# dict, dict, int, list, int ->  int
-# takes a block and checks if head is in it or not
-def zone_check_heads(block, head, ownsize, sizes, counter):
-    if (ownsize > sizes[counter]):
-        if (block == head):
-            return 20
-    if (block == head):
-        return -20
-    return 0
-    
-# dict, dict -> int
-# takes a block and checks if food is in it or not
-def zone_check_food(block, item):
-    if (block == item):
-        return 3
-    return 0
-    
-# dict, dict -> int
-# takes a block and checks if food is in it or not
-def zone_check_food2(block, item):
-    if (block == item):
-        return 1
-    return 0
-    
-# string, dict, dict, dict, dict -> dict
-# takes direction and returns the corresponding block location
-def block_picker(direction, right_block, left_block, down_block, up_block):    
-    if (direction == "right"):
-        return right_block
-    elif (direction == "left"):
-        return left_block
-    elif (direction == "down"):
-        return down_block
-    else: 
-        return up_block
-
 @bottle.post("/end")
 def end():
     """
