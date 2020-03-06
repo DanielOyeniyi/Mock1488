@@ -62,11 +62,9 @@ def move():
     )
 
 def next_move(data):
-
     head = data["you"]["body"][0]
     directions = optimal_directions(data)
     directions = avoid_heads(data, head, directions)
-    
     return target(data, head, directions)
 
 # list, list, dict -> string
@@ -115,9 +113,63 @@ def hungry(data, directions, food, head):
             pathX = x
             pathY = y
             target = item
-    if (data["turn"] > 100):
-        return chase_tail(data, head, directions)
-    return pathing(data, head, target, directions, pathX, pathY)
+            
+    if (head["x"] <= target["x"] and head["y"] <= target["y"]):
+        if ("right" in directions and "down" in directions):
+            if (pathX > pathY):
+                return "right"
+            if (pathX < pathY):
+                return "down" 
+            return random.choice(["right", "down"])
+            
+        if ("down" in directions):  
+            return "down"
+            
+        if ("right" in directions):
+            return "right"
+        
+    if (head["x"] <= target["x"] and head["y"] >= target["y"]):
+        if ("right" in directions and "up" in directions):
+            if (pathX > pathY):
+                return "right"
+            if (pathX < pathY):
+                return "up" 
+            return random.choice(["right", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("right" in directions):
+            return "right"
+            
+    if (head["x"] >= target["x"] and head["y"] <= target["y"]):
+        if ("left" in directions and "down" in directions):
+            if (pathX > pathY):
+                return "left"
+            if (pathX < pathY):
+                return "down" 
+            return random.choice(["left", "down"])
+            
+        if ("down" in directions):  
+            return "down"
+            
+        if ("left" in directions):
+            return "left"
+            
+    if (head["x"] >= target["x"] and head["y"] >= target["y"]):
+        if ("left" in directions and "up" in directions):
+            if (pathX > pathY):
+                return "left"
+            if (pathX < pathY):
+                return "up" 
+            return random.choice(["left", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("left" in directions):
+            return "left"
+    return chase_tail(data, head, directions)
 
 def chase_tail(data, head, directions):  
     pathx = 100
