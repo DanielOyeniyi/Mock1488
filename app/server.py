@@ -72,98 +72,15 @@ def next_move(data):
 # list, list, dict -> string
 # takes a list of possible directions and 
 # picks a direction that will goes towards food
-def hungry(directions, food, head):
-    path = 100   
-    pathx = 100
-    pathy = 100
-    nearest = {}
-    
-    for item in food: 
-        x = abs(item["x"] - head["x"])
-        y = abs(item["y"] - head["y"])
-        distance = x + y 
-        if (distance < path):
-            path = distance
-            pathx = x
-            pathy = y
-            nearest = item
-            
-            
-            
-            # make into a method 
-    if (head["x"] <= nearest["x"] and head["y"] <= nearest["y"]):
-        if ("right" in directions and "down" in directions):
-            if (pathx > pathy):
-                return "right"
-            if (pathx < pathy):
-                return "down" 
-            return random.choice(["right", "down"])
-            
-        if ("down" in directions):  
-            return "down"
-            
-        if ("right" in directions):
-            return "right"
-        
-    if (head["x"] <= nearest["x"] and head["y"] >= nearest["y"]):
-        if ("right" in directions and "up" in directions):
-            if (pathx > pathy):
-                return "right"
-            if (pathx < pathy):
-                return "up" 
-            return random.choice(["right", "up"])
-            
-        if ("up" in directions):  
-            return "up"
-            
-        if ("right" in directions):
-            return "right"
-            
-    if (head["x"] >= nearest["x"] and head["y"] <= nearest["y"]):
-        if ("left" in directions and "down" in directions):
-            if (pathx > pathy):
-                return "left"
-            if (pathx < pathy):
-                return "down" 
-            return random.choice(["left", "down"])
-            
-        if ("down" in directions):  
-            return "down"
-            
-        if ("left" in directions):
-            return "left"
-            
-    if (head["x"] >= nearest["x"] and head["y"] >= nearest["y"]):
-        if ("left" in directions and "up" in directions):
-            if (pathx > pathy):
-                return "left"
-            if (pathx < pathy):
-                return "up" 
-            return random.choice(["left", "up"])
-            
-        if ("up" in directions):  
-            return "up"
-            
-        if ("left" in directions):
-            return "left"
-            
-    if (len(directions) != 0):
-        return random.choice(directions)
-    return "up"  
- 
-
-# list, list, dict -> string
-# takes a list of possible directions and 
-# picks a direction that will goes towards food
 def target(data, head, directions):
     
 
     heads = make_enemy_heads(data, head)
     sizes = make_sizes(data)
     own_size = len(data["you"]["body"])
-    nearest = {}
-    pathx = 100
-    pathy = 100
+    target = {}
+    pathX = 100
+    pathY = 100
     sizing = 0
     
     counter = 0
@@ -174,65 +91,102 @@ def target(data, head, directions):
             y = abs(bad_head["y"] - head["y"])
             if (difference > sizing):
                 sizing = difference
-                nearest = bad_head
+                target = bad_head
     
-    if (len(nearest) != 0):
-        if (head["x"] <= nearest["x"] and head["y"] <= nearest["y"]):
-            if ("right" in directions and "down" in directions):
-                if (pathx > pathy):
-                    return "right"
-                if (pathx < pathy):
-                    return "down" 
-                return random.choice(["right", "down"])
-                
-            if ("down" in directions):  
-                return "down"
-                
-            if ("right" in directions):
-                return "right"
+    if (len(target) != 0):
+        return pathing(data, head, target, directions, pathX, pathY) 
+    return hungry(data, directions, data["board"]["food"], head)
+
+# list, list, dict -> string
+# takes a list of possible directions and 
+# picks a direction that will goes towards food
+def hungry(data, directions, food, head):
+    path = 100   
+    pathx = 100
+    pathy = 100
+    target = {}
+    
+    for item in food: 
+        x = abs(item["x"] - head["x"])
+        y = abs(item["y"] - head["y"])
+        distance = x + y 
+        if (distance < path):
+            path = distance
+            pathX = x
+            pathY = y
+            target = item
             
-        if (head["x"] <= nearest["x"] and head["y"] >= nearest["y"]):
-            if ("right" in directions and "up" in directions):
-                if (pathx > pathy):
-                    return "right"
-                if (pathx < pathy):
-                    return "up" 
-                return random.choice(["right", "up"])
-                
-            if ("up" in directions):  
-                return "up"
-                
-            if ("right" in directions):
+    return pathing(data, head, target, directions, pathX, pathY)
+
+def chase_tail(data, head, directions):  
+    pathx = 100
+    pathy = 100
+    target = data["you"]["body"][-1]
+    
+    pathX = abs(target["x"] - head["x"])
+    pathY = abs(target["y"] - head["y"])
+    
+    if (len(directions) != 0):
+        return pathing(data, head, target, directions, pathX, pathY)
+    return "up"
+
+def pathing(data, head, target, directions, pathX, pathY): 
+    if (head["x"] <= target["x"] and head["y"] <= target["y"]):
+        if ("right" in directions and "down" in directions):
+            if (pathX > pathY):
                 return "right"
-                
-        if (head["x"] >= nearest["x"] and head["y"] <= nearest["y"]):
-            if ("left" in directions and "down" in directions):
-                if (pathx > pathy):
-                    return "left"
-                if (pathx < pathy):
-                    return "down" 
-                return random.choice(["left", "down"])
-                
-            if ("down" in directions):  
-                return "down"
-                
-            if ("left" in directions):
+            if (pathX < pathY):
+                return "down" 
+            return random.choice(["right", "down"])
+            
+        if ("down" in directions):  
+            return "down"
+            
+        if ("right" in directions):
+            return "right"
+        
+    if (head["x"] <= target["x"] and head["y"] >= target["y"]):
+        if ("right" in directions and "up" in directions):
+            if (pathX > pathY):
+                return "right"
+            if (pathX < pathY):
+                return "up" 
+            return random.choice(["right", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("right" in directions):
+            return "right"
+            
+    if (head["x"] >= target["x"] and head["y"] <= target["y"]):
+        if ("left" in directions and "down" in directions):
+            if (pathX > pathY):
                 return "left"
-                
-        if (head["x"] >= nearest["x"] and head["y"] >= nearest["y"]):
-            if ("left" in directions and "up" in directions):
-                if (pathx > pathy):
-                    return "left"
-                if (pathx < pathy):
-                    return "up" 
-                return random.choice(["left", "up"])
-                
-            if ("up" in directions):  
-                return "up"
-                
-            if ("left" in directions):
+            if (pathX < pathY):
+                return "down" 
+            return random.choice(["left", "down"])
+            
+        if ("down" in directions):  
+            return "down"
+            
+        if ("left" in directions):
+            return "left"
+            
+    if (head["x"] >= target["x"] and head["y"] >= target["y"]):
+        if ("left" in directions and "up" in directions):
+            if (pathX > pathY):
                 return "left"
-    return hungry(directions, data["board"]["food"], head)
+            if (pathX < pathY):
+                return "up" 
+            return random.choice(["left", "up"])
+            
+        if ("up" in directions):  
+            return "up"
+            
+        if ("left" in directions):
+            return "left"
+    return chase_tail(data, head, directions)
 
 # dict , int, int-> list
 # takes a list representing a block on the map and 
