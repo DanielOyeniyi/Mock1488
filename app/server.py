@@ -84,14 +84,15 @@ def hungry(directions, food, head):
             path = distance
             nearest = item
             
+            
+    if (head["y"] < nearest["y"] and "up" in directions):
+            return "up"
+    if (head["y"] < nearest["y"] and "down" in directions):
+            return "down"
     if (head["x"] < nearest["x"] and "right" in directions):
             return "right"
     if (head["x"] > nearest["x"] and "left" in directions):
             return "left"
-    if (head["y"] < nearest["y"] and "down" in directions):
-            return "down"
-    if (head["y"] < nearest["y"] and "up" in directions):
-            return "up"
     if (len(directions) != 0):
         return random.choice(directions)
     return "up"  
@@ -117,14 +118,14 @@ def target(data, head, directions):
                 nearest = target
     
     if (len(nearest) != 0):
-        if (head["x"] < nearest["x"] and "right" in directions):
-                return "right"
-        if (head["x"] > nearest["x"] and "left" in directions):
-                return "left"
         if (head["y"] < nearest["y"] and "down" in directions):
                 return "down"
         if (head["y"] < nearest["y"] and "up" in directions):
                 return "up"
+        if (head["x"] < nearest["x"] and "right" in directions):
+                return "right"
+        if (head["x"] > nearest["x"] and "left" in directions):
+                return "left"
     return hungry(directions, data["board"]["food"], head)
 
 # dict , int, int-> list
@@ -150,7 +151,7 @@ def avoid_heads(data, head, directions):
         directions.remove("up")
 
     if (len(directions)==0):
-        directions = optimal_directions_tails(data)
+        directions = optimal_directions_tails(data) # same thing but with heads?
         if (check_around(data, right_block, enemy_heads) != True and "right" in directions):
             directions.remove("right")
         if (check_around(data, left_block, enemy_heads) != True and "left" in directions):
@@ -160,7 +161,7 @@ def avoid_heads(data, head, directions):
         if (check_around(data, up_block, enemy_heads) != True and "up" in directions):
             directions.remove("up")
 
-    if (len(directions)==0):
+    if (len(directions)==0):  
         if (right_block in tails):
             directions.append("right") 
         if (left_block in tails):
