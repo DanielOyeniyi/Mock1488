@@ -188,7 +188,7 @@ def pathing(data, head, target, directions, pathX, pathY):
         if ("left" in directions):
             return "left"
     if (len(directions) != 0):
-        random.choice(directions)
+        return random.choice(directions)
     return "up"
 
 # dict , int, int-> list
