@@ -115,7 +115,7 @@ def hungry(data, directions, food, head):
             pathX = x
             pathY = y
             target = item
-    if (data["you"]["health"] > 50):
+    if (data["turn"] > 100):
         return chase_tail(data, head, directions)
     return pathing(data, head, target, directions, pathX, pathY)
 
