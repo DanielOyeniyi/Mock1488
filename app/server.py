@@ -71,8 +71,6 @@ def next_move(data):
 # takes a list of possible directions and 
 # picks a direction that will goes towards food
 def target(data, head, directions):
-    
-
     heads = make_enemy_heads(data, head)
     sizes = make_sizes(data)
     own_size = len(data["you"]["body"])
@@ -90,6 +88,8 @@ def target(data, head, directions):
             if (difference > sizing):
                 sizing = difference
                 target = bad_head
+                pathX = x
+                pathY = y
     
     if (len(target) != 0):
         return pathing(data, head, target, directions, pathX, pathY) 
@@ -171,6 +171,8 @@ def hungry(data, directions, food, head):
             return "left"
     return chase_tail(data, head, directions)
 
+# keep track of the # of block to the tail
+# then cricles your own body
 def chase_tail(data, head, directions):  
     pathx = 100
     pathy = 100
@@ -369,6 +371,7 @@ def check_around_surrounded(data, block, heads):
         counter += 1
     return safe
     
+# make it avoid going near the wall unless it has to
 checked = []
 def optimal_directions(data):
     head = data["you"]["body"][0]
