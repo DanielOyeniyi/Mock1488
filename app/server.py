@@ -585,10 +585,12 @@ def make_tails(data):
 # makes a list of all the snakes sizes
 def make_sizes(data): 
     sizes = []
+    you = data["you"]
     for snake in data["board"]["snakes"]: 
-        body = snake["body"]
-        size = len(body)
-        sizes.append(size)
+        if (snake != you):
+            body = snake["body"]
+            size = len(body)
+            sizes.append(size)
     return sizes
     
 @bottle.post("/end")
