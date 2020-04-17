@@ -80,20 +80,30 @@ def value(data):
     snakes = make_snakes(data)
     walls = make_walls(data)
     
+    print(walls)
+    
     right_block = {"x": head["x"] + 1, "y": head["y"]}
     left_block = {"x": head["x"] - 1, "y": head["y"]}
     down_block = {"x": head["x"], "y": head["y"] + 1}
     up_block = {"x": head["x"], "y": head["y"] - 1}
+    
+    
+    print(right_block)
     
     right_val = 0
     left_val = 0
     down_val = 0
     up_val = 0
     
-    right_val = value_helper(data, snakes, walls, 0, head)
-    left_val = value_helper(data, snakes, walls, 0, head)
-    down_val = value_helper(data, snakes, walls, 0, head)
-    up_val = value_helper(data, snakes, walls, 0, head)
+    right_val = value_helper(data, snakes, walls, 0, right_block)
+    left_val = value_helper(data, snakes, walls, 0, left_block)
+    down_val = value_helper(data, snakes, walls, 0, down_block)
+    up_val = value_helper(data, snakes, walls, 0, up_block)
+    
+    print(right_val)
+    print(left_val)
+    print(down_val)
+    print(up_val)
     
     print(num_loops)
     # might need a hint of randomness if there is more than 
@@ -112,7 +122,7 @@ def value(data):
 def value_helper(data, snakes, walls, depth, block):
     global num_loops 
     num_loops += 1
-    if (depth == 6):
+    if (depth == 6 or block in snakes or block in walls):
         return 0
     else:
         right_block = {"x": block["x"] + 1, "y": block["y"]}
@@ -130,17 +140,10 @@ def value_helper(data, snakes, walls, depth, block):
         # then that is worth more than just surviving, food score 
         # should be considered too
         
-        if (right_block not in snakes and right_block not in walls):
-            right_val = value_helper(data, snakes, walls, depth+1, right_block)
-
-        if (left_block not in snakes and left_block not in walls):
-            left_val = value_helper(data, snakes, walls, depth+1, left_block)
-
-        if (down_block not in snakes and down_block not in walls):
-            down_val = value_helper(data, snakes, walls, depth+1, down_block)
-
-        if (up_block not in snakes and up_block not in walls):
-            up_val = value_helper(data, snakes, walls, depth+1, up_block)
+        right_val = value_helper(data, snakes, walls, depth+1, right_block)
+        left_val = value_helper(data, snakes, walls, depth+1, left_block)
+        down_val = value_helper(data, snakes, walls, depth+1, down_block)
+        up_val = value_helper(data, snakes, walls, depth+1, up_block)
             
         max_val = max(right_val, left_val, down_val, up_val)
             
@@ -170,11 +173,11 @@ def make_walls(data):
             
         entry = {}
         entry["x"] = x
-        entry["y"] = data["board"]["height"]+1
+        entry["y"] = data["board"]["height"]
         if (entry not in walls):
             walls.append(entry)
         
-    for y in range (data["board"]["height"]+1):
+    for y in range (data["board"]["height"]):
         entry = {}
         entry["x"] = -1
         entry["y"] = y
@@ -182,7 +185,7 @@ def make_walls(data):
             walls.append(entry)
         
         entry = {}
-        entry["x"] = data["board"]["width"]+1
+        entry["x"] = data["board"]["width"]
         entry["y"] = y
         if (entry not in walls):
             walls.append(entry)
