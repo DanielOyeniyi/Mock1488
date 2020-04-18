@@ -47,8 +47,8 @@ def move():
     #next_move(data)
     print("MOVE:", json.dumps(data))
 
-
-    move = "left" #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
+    moves = ["right", "left", "down", "up"]
+    move = random.choice(moves) #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
 
     #move = next_move(data)
 
@@ -67,14 +67,14 @@ def move():
         }  
     }
 
-              # LOCATION: of snake head
+          # LOCATION: of snake head
     locHeadX = data["you"]["body"][0]["x"]
     locHeadY = data["you"]["body"][0]["y"]
-        
+
     #If statement to force snake away from boundaries/wall
     #x boundary/walls/corners
     if (locHeadX == (widthBoard-1)):  #farthest x-axis length, a length of 11 is represented by index 10  
-                # LOCATION: of neck1 
+          # LOCATION: of neck1 
         neck1X = data["you"]["body"][1]["x"]
         if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
             move = "up"
@@ -82,7 +82,7 @@ def move():
             move = "left"
 
     if (locHeadX == 0):  #closest x-axis length
-         
+
         neck1X = data["you"]["body"][1]["x"]
         if(neck1X ==(1)):
           move = "up"
@@ -94,24 +94,36 @@ def move():
     if (locHeadY == heightBoard):
         neck1Y = data["you"]["body"][1]["y"]
         if (neck1Y == heightBoard-2):
-                move = "right"
+            move = "right"
         else:
             move = "up"
-      
+
     if (locHeadY == 0):
         neck1Y = data["you"]["body"][1]["y"]
         if (neck1Y == 1):
           move = "right"
         else:
-            move = "down"
-        
+          move = "down"
+
 
     #END OF FIRST PRIORITY #############################################
 
-        
+        #SECOND PRIORITY - Snake should find shortest path to fruit
+
+
+
+
+
+
+
+
+
+
+
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
+        
 
     response = {"move": move, "shout": shout}
     return HTTPResponse(
