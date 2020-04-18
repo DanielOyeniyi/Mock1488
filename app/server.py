@@ -46,12 +46,12 @@ def move():
     data = bottle.request.json
     #next_move(data)
     print("MOVE:", json.dumps(data))
-    
-    
+
+
     move = "left" #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
 
     #move = next_move(data)
-    
+
     #FIRST PRIORITY - Snake should avoid hitting walls 
     heightBoard = data["board"]["height"] #retrieve height 
     widthBoard = data["board"]["width"]  #retrieve width 
@@ -66,27 +66,46 @@ def move():
           "y": halfHeight
         }  
     }
-    
-    # LOCATION: of snake head
+
+              # LOCATION: of snake head
     locHeadX = data["you"]["body"][0]["x"]
     locHeadY = data["you"]["body"][0]["y"]
-
+        
     #If statement to force snake away from boundaries/wall
     #x boundary/walls/corners
-    if (locHeadX == (widthBoard-1)): 
-    	 move = "left"
-    
-    if (locHeadX == 0):
-     	 move = "right"
-    
-    
+    if (locHeadX == (widthBoard-1)):  #farthest x-axis length, a length of 11 is represented by index 10  
+                # LOCATION: of neck1 
+        neck1X = data["you"]["body"][1]["x"]
+        if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
+            move = "up"
+        else:
+            move = "left"
+
+    if (locHeadX == 0):  #closest x-axis length
+         
+        neck1X = data["you"]["body"][1]["x"]
+        if(neck1X ==(1)):
+          move = "up"
+        else:
+          move = "right"
+
+
     #y boundary/walls/corners
     if (locHeadY == heightBoard):
-      	move = "up"
+        neck1Y = data["you"]["body"][1]["y"]
+        if (neck1Y == heightBoard-2):
+                move = "right"
+        else:
+            move = "up"
       
     if (locHeadY == 0):
-        move = "down"
-    
+        neck1Y = data["you"]["body"][1]["y"]
+        if (neck1Y == 1):
+          move = "right"
+        else:
+            move = "down"
+        
+
     #END OF FIRST PRIORITY #############################################
 
         
