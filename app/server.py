@@ -79,8 +79,8 @@ def value(data):
     head = data["you"]["body"][0]
     snakes = make_snakes(data)
     walls = make_walls(data)
+    food = make_food(data)
     
-    print(walls)
     
     right_block = {"x": head["x"] + 1, "y": head["y"]}
     left_block = {"x": head["x"] - 1, "y": head["y"]}
@@ -88,17 +88,15 @@ def value(data):
     up_block = {"x": head["x"], "y": head["y"] - 1}
     
     
-    print(right_block)
-    
     right_val = 0
     left_val = 0
     down_val = 0
     up_val = 0
     
-    right_val = value_helper(data, snakes, walls, 0, right_block)
-    left_val = value_helper(data, snakes, walls, 0, left_block)
-    down_val = value_helper(data, snakes, walls, 0, down_block)
-    up_val = value_helper(data, snakes, walls, 0, up_block)
+    right_val = value_helper(data, snakes, walls, food, 0,right_block)
+    left_val = value_helper(data, snakes, walls, food, 0,left_block)
+    down_val = value_helper(data, snakes, walls, food, 0,down_block)
+    up_val = value_helper(data, snakes, walls, food, 0,up_block)
     
     print(right_val)
     print(left_val)
@@ -119,7 +117,12 @@ def value(data):
         return "up"
 
 # this is super inneficient
-def value_helper(data, snakes, walls, depth, block):
+# currently it's just checking available blocks rather than all the available 
+# blocks of previous snakes
+# for enemy snake moves we can call this but 
+# add a bool that determins if numberes will be added or
+# subtracted
+def value_helper(data, snakes, walls, food, depth, block):
     global num_loops 
     num_loops += 1
     if (depth == 6 or block in snakes or block in walls):
@@ -140,10 +143,19 @@ def value_helper(data, snakes, walls, depth, block):
         # then that is worth more than just surviving, food score 
         # should be considered too
         
-        right_val = value_helper(data, snakes, walls, depth+1, right_block)
-        left_val = value_helper(data, snakes, walls, depth+1, left_block)
-        down_val = value_helper(data, snakes, walls, depth+1, down_block)
-        up_val = value_helper(data, snakes, walls, depth+1, up_block)
+        right_val = value_helper(data, snakes, walls, food, depth+1, right_block)
+        left_val = value_helper(data, snakes, walls, food, depth+1, left_block)
+        down_val = value_helper(data, snakes, walls, food, depth+1, down_block)
+        up_val = value_helper(data, snakes, walls, food, depth+1, up_block)
+            
+        if (right_block in food):
+            right_val += 3
+        if (left_block in food):
+            left_val += 3
+        if (down_block in food):
+            down_val += 3
+        if (up_block in food):
+            up_val += 3
             
         max_val = max(right_val, left_val, down_val, up_val)
             
@@ -191,7 +203,13 @@ def make_walls(data):
             walls.append(entry)
            
     return walls
-            
+# dict -> list
+# returns a list of dicts representing food location
+def make_food(data):
+    food = []
+    for item in data["board"]["food"]:
+        food.append(item)
+    return food
             
 @bottle.post("/end")
 def end():
