@@ -46,11 +46,50 @@ def move():
     data = bottle.request.json
     #next_move(data)
     print("MOVE:", json.dumps(data))
+    
+    
+    move = "left" #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
 
     #move = next_move(data)
-
-    move = "left"
     
+    #FIRST PRIORITY - Snake should avoid hitting walls 
+    heightBoard = data["board"]["height"] #retrieve height 
+    widthBoard = data["board"]["width"]  #retrieve width 
+
+    halfHeight = heightBoard / 2
+    halfWidth = widthBoard / 2
+
+    centerBlock = {		#location of center of board
+      "centerB":
+        {
+          "x": halfWidth,
+          "y": halfHeight
+        }  
+    }
+    
+    # LOCATION: of snake head
+    locHeadX = data["you"]["body"][0]["x"]
+    locHeadY = data["you"]["body"][0]["y"]
+
+    #If statement to force snake away from boundaries/wall
+    #x boundary/walls/corners
+    if (locHeadX == (widthBoard-1)): 
+    	 move = "left"
+    
+    if (locHeadX == 0):
+     	 move = "right"
+    
+    
+    #y boundary/walls/corners
+    if (locHeadY == heightBoard):
+      	move = "up"
+      
+    if (locHeadY == 0):
+        move = "down"
+    
+    #END OF FIRST PRIORITY #############################################
+
+        
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
