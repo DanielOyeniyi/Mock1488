@@ -126,7 +126,38 @@ def move():
         moves.remove("down")
       
       
+      #prevents snake from getting blocked: Checks to see if snake head will be blocked up by body in all options after moving 1 to right, left, up, down
+      
+    right2 = {"x": locHeadX + 2, "y": locHeadY}
+    right1up1 = {"x": locHeadX + 1, "y": locHeadY + 1}
+    right1down1 = {"x": locHeadX + 1, "y": locHeadY - 1}
+    
+    left2 = {"x": locHeadX - 2, "y": locHeadY} 
+    left1up1 = {"x": locHeadX - 1, "y": locHeadY + 1}
+    left1down1 = {"x": locHeadX - 1, "y": locHeadY - 1}
+    
+    up2 = {"x": locHeadX, "y": locHeadY-2}
+    up1right1 = {"x": locHeadX + 1, "y": locHeadY + 1}
+    up1left1 = {"x": locHeadX - 1, "y": locHeadY + 1}
+    
+    down2 = {"x": locHeadX, "y": locHeadY+2}
+    down1right1 = {"x": locHeadX + 1, "y": locHeadY - 1}
+    down1left1 = {"x": locHeadX - 1, "y": locHeadY - 1}
 
+    
+    # if(condition1 and condition2 and condition3)
+    
+    if (right2 in data["you"]["body"]) and (right1up1 in data["you"]["body"]) and (right1down1 in data["you"]["body"]):  #checks to see if body part is 2 right AND 1right 1up AND 1right 1down, to the head.
+        moves.remove("right")
+      
+   	if (left2 in data["you"]["body"]) and (left1up1 in data["you"]["body"]) and (left1down1 in data["you"]["body"]):  #checks to see if body part is 2 left AND 1left 1up AND 1left 1down, to the head.
+        moves.remove("left")
+        
+    if (up2 in data["you"]["body"]) and (up1right1 in data["you"]["body"]) and (up1left1 in data["you"]["body"]):  #checks to see if body part is 2 up AND 1left 1up AND 1right 1up, to the head.
+        moves.remove("up") 
+        
+    if (down2 in data ["you"]["body"] and down1right1 in data["you"]["body"] and down1left1 in data["you"]["body"]): #checks to see if body part is 2 down AND 1left 1down AND 1right 1down, to the head.
+      	moves.remove("down")
       
     '''
     if (data["you"]["body"][i]["x"] == (locHeadX + 1) and (data["you"]["body"][i]["y"] == locHeadY):  #checks to see if body part is 1 right to the head.
