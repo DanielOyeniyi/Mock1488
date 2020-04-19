@@ -111,10 +111,15 @@ def value(data):
     down_val = 0
     up_val = 0
     
-    right_val = value_helper(data, snakes, data["you"]["body"], 0, right_block)
-    left_val = value_helper(data, snakes, data["you"]["body"], 0, left_block)
-    down_val = value_helper(data, snakes, data["you"]["body"], 0, down_block)
-    up_val = value_helper(data, snakes, data["you"]["body"], 0, up_block)
+    depth = 0
+    if (is_free(data, snakes, right_block) and is_free(data, snakes, left_block) and 
+        is_free(data, snakes, down_block) and is_free(data, snakes, up_block)):
+        depth = 1
+    
+    right_val = value_helper(data, snakes, data["you"]["body"], depth, right_block)
+    left_val = value_helper(data, snakes, data["you"]["body"], depth, left_block)
+    down_val = value_helper(data, snakes, data["you"]["body"], depth, down_block)
+    up_val = value_helper(data, snakes, data["you"]["body"], depth, up_block)
     
     print(right_val)
     print(left_val)
