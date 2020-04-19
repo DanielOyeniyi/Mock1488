@@ -44,7 +44,6 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    next_move(data)
     print("MOVE:", json.dumps(data))
 
     move = next_move(data)
@@ -77,10 +76,20 @@ def next_move(data):
 # but the sizing would have to change as that would take too 
 # long to compute
 
+
+# we need to make it remember it's last moves so that it
+# does't count more than once. maybe add the block into 
+# a temp list of snakes
+# could make add the new move to the list of snakes
+# every move you  remove the last part of your own 
+# snake from the list. unless you ate food then you skip 
+# it for the current turn
+
 # dict, dict -> string
 # function checks all the moves up to a certain depth
 def value(data):
     head = data["you"]["body"][0]
+    snakes = make_snakes(data)
     directions = []
     
     right_block = {"x": head["x"] + 1, "y": head["y"]}
@@ -93,12 +102,16 @@ def value(data):
     down_val = 0
     up_val = 0
     
-    right_val = value_helper(data, 0, right_block)
-    left_val = value_helper(data, 0, left_block)
-    down_val = value_helper(data, 0, down_block)
-    up_val = value_helper(data, 0, up_block)
+    right_val = value_helper(data, snakes, 0, right_block)
+    left_val = value_helper(data, snakes, 0, left_block)
+    down_val = value_helper(data, snakes, 0, down_block)
+    up_val = value_helper(data, snakes, 0, up_block)
     
-    
+    print(right_val)
+    print(left_val)
+    print(down_val)
+    print(up_val)
+
     print(num_loops)
     max_val = max(right_val, left_val, down_val, up_val)
     if (max_val == right_val):
@@ -117,12 +130,16 @@ def value(data):
 # for enemy snake moves we can call this but 
 # add a bool that determins if numberes will be added or
 # subtracted
-def value_helper(data, depth, block):
+def value_helper(data, snakes, depth, block):
     global num_loops 
-    num_loops += 1
-    if (depth == 8 or not is_available(data, block)):
+    if (depth == 8 or not is_available(data, snakes, block)):
         return 0
     else:
+        num_loops += 1
+        # currently it does not act differently around tails
+        tmp_snakes = snakes.copy()
+        tmp_snakes.append(block)
+        
         right_block = {"x": block["x"] + 1, "y": block["y"]}
         left_block = {"x": block["x"] - 1, "y": block["y"]}
         down_block = {"x": block["x"], "y": block["y"] + 1}
@@ -138,10 +155,14 @@ def value_helper(data, depth, block):
         # then that is worth more than just surviving, food score 
         # should be considered too
         
-        right_val = value_helper(data, depth+1, right_block)
-        left_val = value_helper(data, depth+1, left_block)
-        down_val = value_helper(data, depth+1, down_block)
-        up_val = value_helper(data, depth+1, up_block)
+        
+        # currently the tmp_snakes just adds the last block
+        # it doesn't remove the tail block 
+        right_val = value_helper(data, tmp_snakes, depth+1, right_block)
+        left_val = value_helper(data, tmp_snakes, depth+1, left_block)
+        down_val = value_helper(data, tmp_snakes, depth+1, down_block)
+        up_val = value_helper(data, tmp_snakes, depth+1, up_block)
+            
             
         if (right_block in data["board"]["food"]):
             right_val += 1
@@ -153,6 +174,9 @@ def value_helper(data, depth, block):
             up_val += 1
             
         max_val = max(right_val, left_val, down_val, up_val)
+            
+        if (block in data["board"]["food"] and depth == 0):
+            max_val += 1
             
         return max_val + 1
 
@@ -167,15 +191,23 @@ def value_helper(data, depth, block):
 # then returns a bool corresponding to the coordinates 
 # location on the board. i.e. false if pos is in snakes 
 # or a wall, false otherwise
-def is_available(data, pos):
-    for snake in data["board"]["snakes"]:
-        if (pos in snake["body"]):
-            return False
+def is_available(data, snakes, pos):
+    if (pos in snakes):
+        return False
     if (pos["x"] == -1 or pos["x"] == data["board"]["width"]):
         return False
     if (pos["y"] == -1 or pos["y"] == data["board"]["width"]):
         return False
     return True
+    
+#dict -> list
+# returns a list of dicts representing snake locations
+def make_snakes(data):
+    snakes = []
+    for snake in data["board"]["snakes"]:
+        for part in snake["body"]:
+            snakes.append(part)
+    return snakes
     
 @bottle.post("/end")
 def end():
