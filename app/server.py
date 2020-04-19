@@ -112,7 +112,7 @@ def move():
       move.remove("left")
           
     if (up in data["you"]["body"]): #checks to see if body part is 1 UP to the head.
-        move = "right"
+        move.remove("up")
         
     if (down in data["you"]["body"]): #checks to see if body part is 1 DOWN to the head.
         move.remove("down")
