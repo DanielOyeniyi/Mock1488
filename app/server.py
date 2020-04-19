@@ -47,6 +47,7 @@ def move():
     print("MOVE:", json.dumps(data))
 
     move = next_move(data)
+    num_loops = 0
     
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
@@ -68,22 +69,30 @@ num_loops = 0
 # we take into account the possible moves of other snakes
 def next_move(data):
     global num_loops
-    num_loops = 0
     return value(data)
 
+"""
+we could do that check every available spot with the next 6 moves
+but the sizing would have to change as that would take too 
+long to compute
 
-# we could do that check every available spot with the next 6 moves
-# but the sizing would have to change as that would take too 
-# long to compute
+
+we need to make it remember it's last moves so that it
+does't count more than once. maybe add the block into 
+a temp list of snakes
+could make add the new move to the list of snakes
+every move you  remove the last part of your own 
+snake from the list. unless you ate food then you skip 
+it for the current turn
 
 
-# we need to make it remember it's last moves so that it
-# does't count more than once. maybe add the block into 
-# a temp list of snakes
-# could make add the new move to the list of snakes
-# every move you  remove the last part of your own 
-# snake from the list. unless you ate food then you skip 
-# it for the current turn
+
+
+we could add the # of available blocks to the score for
+each entry. It might just mean that we sacrifice 
+move depth. this could be accomplished by leveraging off of
+our older code
+"""
 
 # dict, dict -> string
 # function checks all the moves up to a certain depth
@@ -132,11 +141,10 @@ def value(data):
 # subtracted
 def value_helper(data, snakes, body, depth, block):
     global num_loops 
-    if (depth == 8 or not is_available(data, snakes, block)):
+    num_loops += 1
+    if (depth == 4 or not is_free(data, snakes, block)):
         return 0
     else:
-        num_loops += 1
-        # currently it does not act differently around tails
         tmp_snakes = snakes.copy()
         tmp_snakes.insert(0, block)
         
@@ -165,10 +173,11 @@ def value_helper(data, snakes, body, depth, block):
         
         # currently the tmp_snakes just adds the last block
         # it doesn't remove the tail block. or just past blocks
-        right_val = value_helper(data, tmp_snakes, tmp_body, depth+1, right_block)
-        left_val = value_helper(data, tmp_snakes, tmp_body, depth+1, left_block)
-        down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block)
-        up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block)
+        right_val = value_helper(data, tmp_snakes, tmp_body, depth+1, right_block) + num_free(data, right_block)
+        
+        left_val = value_helper(data, tmp_snakes, tmp_body, depth+1, left_block) + num_free(data, left_block)
+        down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block) + num_free(data, down_block)
+        up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block) + num_free(data, up_block)
             
             
         # if (right_block in data["board"]["food"]):
@@ -193,12 +202,38 @@ def value_helper(data, snakes, body, depth, block):
 # have a is_near function that runs instead?
 # but how much computing power does that really save?
 
+
+# dict, dict -> int
+# checks all the free blocks conected to the input block
+def num_free(data, block):
+    checked = []
+    snakes = make_snakes(data)
+    return num_free_helper(data, snakes, checked, block)
+    
+def num_free_helper(data, snakes, checked, block):
+    global num_loops
+    num_loops += 1
+    if (not is_free(data, snakes, block) or block in checked):
+        return 0
+    else: 
+        checked.append(block)
+        right_block = {"x": block["x"] + 1, "y": block["y"]}
+        left_block = {"x": block["x"] - 1, "y": block["y"]}
+        down_block = {"x": block["x"], "y": block["y"] + 1}
+        up_block = {"x": block["x"], "y": block["y"] - 1}
+        
+        return (num_free_helper(data, snakes, checked, right_block) +
+                num_free_helper(data, snakes, checked, left_block) +
+                num_free_helper(data, snakes, checked, down_block) +
+                num_free_helper(data, snakes, checked, up_block) + 1)   
+
+
 # dict, dict -> bool
 # takes game board and a dict with x,y coordinates 
 # then returns a bool corresponding to the coordinates 
 # location on the board. i.e. false if pos is in snakes 
 # or a wall, false otherwise
-def is_available(data, snakes, pos):
+def is_free(data, snakes, pos):
     if (pos in snakes):
         return False
     if (pos["x"] == -1 or pos["x"] == data["board"]["width"]):
@@ -206,7 +241,8 @@ def is_available(data, snakes, pos):
     if (pos["y"] == -1 or pos["y"] == data["board"]["width"]):
         return False
     return True
-    
+
+
 #dict -> list
 # returns a list of dicts representing snake locations
 def make_snakes(data):
