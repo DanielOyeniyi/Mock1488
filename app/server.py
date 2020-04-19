@@ -147,7 +147,7 @@ def value(data):
 def value_helper(data, snakes, body, depth, block):
     global num_loops 
     num_loops += 1
-    if (depth == 4 or not is_free(data, snakes, block)):
+    if (depth == 3 or not is_free(data, snakes, block)):
         return 0
     else:
         tmp_snakes = snakes.copy()
@@ -179,7 +179,6 @@ def value_helper(data, snakes, body, depth, block):
         # currently the tmp_snakes just adds the last block
         # it doesn't remove the tail block. or just past blocks
         right_val = value_helper(data, tmp_snakes, tmp_body, depth+1, right_block) + num_free(data, right_block)
-        
         left_val = value_helper(data, tmp_snakes, tmp_body, depth+1, left_block) + num_free(data, left_block)
         down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block) + num_free(data, down_block)
         up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block) + num_free(data, up_block)
