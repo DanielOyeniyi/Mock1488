@@ -136,12 +136,12 @@ def move():
     left1down1 = {"x": locHeadX - 1, "y": locHeadY - 1}
 
     up2 = {"x": locHeadX, "y": locHeadY-2}
-    up1right1 = {"x": locHeadX + 1, "y": locHeadY + 1}
-    up1left1 = {"x": locHeadX - 1, "y": locHeadY + 1}
+    up1right1 = {"x": locHeadX + 1, "y": locHeadY - 1}
+    up1left1 = {"x": locHeadX - 1, "y": locHeadY - 1}
 
     down2 = {"x": locHeadX, "y": locHeadY+2}
-    down1right1 = {"x": locHeadX + 1, "y": locHeadY - 1}
-    down1left1 = {"x": locHeadX - 1, "y": locHeadY - 1}
+    down1right1 = {"x": locHeadX + 1, "y": locHeadY + 1}
+    down1left1 = {"x": locHeadX - 1, "y": locHeadY + 1}
 
     # if(condition1 and condition2 and condition3)
 
@@ -167,7 +167,7 @@ def move():
     elif (data["you"]["body"][i]["x"] == (locHeadX) and (data["you"]["body"][i]["y"] == (locHeadY - 1)): #checks to see if body part is 1 down to the head.
             move = "left"         
     '''
-    
+
     #END OF SECOND PRIORITY #############################################
 
 
