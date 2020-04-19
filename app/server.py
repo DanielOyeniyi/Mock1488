@@ -126,7 +126,7 @@ def move():
         moves.remove("down")
       
       
-      #prevents snake from getting blocked: Checks to see if snake head will be blocked up by body in all options after moving 1 to right, left, up, down
+    #prevents snake from getting blocked: Checks to see if snake head will be blocked up by body in all options after moving 1 to right, left, up, down
       
     right2 = {"x": locHeadX + 2, "y": locHeadY}
     right1up1 = {"x": locHeadX + 1, "y": locHeadY + 1}
