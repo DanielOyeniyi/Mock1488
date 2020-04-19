@@ -61,36 +61,44 @@ def move():
 
     #If statement to force snake away from boundaries/wall
     #x boundary/walls/corners
-    if (locHeadX == (widthBoard-1)):  #farthest x-axis length, a length of 11 is represented by index 10  
+    if (locHeadX == widthBoard-1):  #farthest x-axis length, a length of 11 is represented by index 10  
+        moves.remove("right")
+        
         # LOCATION: of neck1 
-        neck1X = data["you"]["body"][1]["x"]
-        if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
-            move = "up"
-        else:
-            move = "left"
+       # neck1X = data["you"]["body"][1]["x"]
+       # if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
+        #    move = "up"
+       # else:
+        #    move = "left"
 
     if (locHeadX == 0):  #closest x-axis length
-        neck1X = data["you"]["body"][1]["x"]
-        if(neck1X ==(1)):
-          move = "up"
-        else:
-          move = "right"
+    	moves.remove("left")
+      
+     #   neck1X = data["you"]["body"][1]["x"]
+      #  if(neck1X ==(1)):
+       #   move = "up"
+        #else:
+         # move = "right"
 
 
     #y boundary/walls/corners
-    if (locHeadY == heightBoard):
-        neck1Y = data["you"]["body"][1]["y"]
-        if (neck1Y == heightBoard-2):
-            move = "right"
-        else:
-            move = "up"
+    if (locHeadY == heightBoard-1):
+        moves.remove("down")
+        
+        #neck1Y = data["you"]["body"][1]["y"]
+        #if (neck1Y == heightBoard-2):
+         #   move = "right"
+        #else:
+         #   move = "up"
 
     if (locHeadY == 0):
-        neck1Y = data["you"]["body"][1]["y"]
-        if (neck1Y == 1):
-          move = "right"
-        else:
-          move = "down"
+    	moves.remove("up")
+      
+      #neck1Y = data["you"]["body"][1]["y"]
+      # if (neck1Y == 1):
+        #  move = "right"
+        #else:
+         # move = "down"
 
 
     #END OF FIRST PRIORITY #############################################
