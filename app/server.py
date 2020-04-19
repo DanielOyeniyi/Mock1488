@@ -106,16 +106,16 @@ def move():
     down = {"x": locHeadX, "y": locHeadY+1}
 
     if (right in data["you"]["body"]):  #checks to see if body part is 1 RIGHT to the head.
-      move.remove("right")
+        moves.remove("right")
         
     if (left in data["you"]["body"]):  #checks to see if body part is 1 LEFT to the head.
-      move.remove("left")
+        moves.remove("left")
           
     if (up in data["you"]["body"]): #checks to see if body part is 1 UP to the head.
-        move.remove("up")
+        moves.remove("up")
         
     if (down in data["you"]["body"]): #checks to see if body part is 1 DOWN to the head.
-        move.remove("down")
+        moves.remove("down")
       
       
 
