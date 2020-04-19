@@ -47,7 +47,7 @@ def move():
     #next_move(data)
     print("MOVE:", json.dumps(data))
 
-		moves = ["right", "left", "down", "up"]
+    moves = ["right", "left", "down", "up"]
 
     #move = next_move(data)
 
@@ -180,10 +180,7 @@ def move():
         headers={"Content-Type": "application/json"},
         body=json.dumps(response),
     )
-
-
-
-     
+    
 @bottle.post("/end")
 def end():
     """
