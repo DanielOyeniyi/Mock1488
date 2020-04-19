@@ -102,10 +102,10 @@ def value(data):
     down_val = 0
     up_val = 0
     
-    # right_val = value_helper(data, snakes, data["you"]["body"], 0, right_block)
+    right_val = value_helper(data, snakes, data["you"]["body"], 0, right_block)
     left_val = value_helper(data, snakes, data["you"]["body"], 0, left_block)
-    # down_val = value_helper(data, snakes, data["you"]["body"], 0, down_block)
-    # up_val = value_helper(data, snakes, data["you"]["body"], 0, up_block)
+    down_val = value_helper(data, snakes, data["you"]["body"], 0, down_block)
+    up_val = value_helper(data, snakes, data["you"]["body"], 0, up_block)
     
     print(right_val)
     print(left_val)
