@@ -44,12 +44,9 @@ def move():
     Your response must include your move of up, down, left, or right.
     """
     data = bottle.request.json
-    #next_move(data)
     print("MOVE:", json.dumps(data))
 
     moves = ["right", "left", "down", "up"]
-
-    #move = next_move(data)
 
     #FIRST PRIORITY - Snake should avoid hitting walls 
     heightBoard = data["board"]["height"] #retrieve height 
@@ -58,22 +55,14 @@ def move():
     halfHeight = heightBoard / 2
     halfWidth = widthBoard / 2
 
-    # centerBlock = {		#location of center of board
-      # "centerB":
-        # {
-          # "x": halfWidth,
-          # "y": halfHeight
-        # }  
-    # }
-
-          # LOCATION: of snake head
+    # LOCATION: of snake head
     locHeadX = data["you"]["body"][0]["x"]
     locHeadY = data["you"]["body"][0]["y"]
 
     #If statement to force snake away from boundaries/wall
     #x boundary/walls/corners
     if (locHeadX == (widthBoard-1)):  #farthest x-axis length, a length of 11 is represented by index 10  
-          # LOCATION: of neck1 
+        # LOCATION: of neck1 
         neck1X = data["you"]["body"][1]["x"]
         if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
             move = "up"
@@ -90,7 +79,7 @@ def move():
 
     #y boundary/walls/corners
     if (locHeadY == heightBoard):
-      	neck1Y = data["you"]["body"][1]["y"]
+        neck1Y = data["you"]["body"][1]["y"]
         if (neck1Y == heightBoard-2):
             move = "right"
         else:
@@ -105,73 +94,73 @@ def move():
 
 
     #END OF FIRST PRIORITY #############################################
-    
-    
-		#SECOND PRIORITY - Snake should avoid hitting itself
+
+
+    #SECOND PRIORITY - Snake should avoid hitting itself
 
     #Checks 1 block to the right,left,up,down to see if any of the snake's body part is in there (using the snake head location + or - 1 as a reference), if it is then it will remove the direction from the moves list.
-	
-  	right = {"x": locHeadX + 1, "y": locHeadY}
+
+    right = {"x": locHeadX + 1, "y": locHeadY}
     left = {"x": locHeadX - 1, "y": locHeadY} 
     up = {"x": locHeadX, "y": locHeadY-1}
     down = {"x": locHeadX, "y": locHeadY+1}
-    
+
     if (right in data["you"]["body"]):  #checks to see if body part is 1 RIGHT to the head.
       move.remove("right")
-     	
+        
     if (left in data["you"]["body"]):  #checks to see if body part is 1 LEFT to the head.
       move.remove("left")
           
     if (up in data["you"]["body"]): #checks to see if body part is 1 UP to the head.
-      	move = "right"
+        move = "right"
         
     if (down in data["you"]["body"]): #checks to see if body part is 1 DOWN to the head.
-      	move.remove("down")
+        move.remove("down")
       
       
 
       
-      '''
+    '''
     if (data["you"]["body"][i]["x"] == (locHeadX + 1) and (data["you"]["body"][i]["y"] == locHeadY):  #checks to see if body part is 1 right to the head.
         move = "up"
     elif (data["you"]["body"][i]["x"] == (locHeadX - 1) and (data["you"]["body"][i]["y"] == locHeadY): #checks to see if body part is 1 left to the head.
         move = "down"
     elif (data["you"]["body"][i]["x"] == (locHeadX) and (data["you"]["body"][i]["y"] == (locHeadY + 1)): #checks to see if body part is 1 up to the head.
-    		move = "right"
+            move = "right"
     elif (data["you"]["body"][i]["x"] == (locHeadX) and (data["you"]["body"][i]["y"] == (locHeadY - 1)): #checks to see if body part is 1 down to the head.
-    		move = "left"         
-     '''
+            move = "left"         
+    '''
           
 
         
-    
+
     #END OF SECOND PRIORITY #############################################
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     #THIRD PRIORITY - Snake should find shortest path to fruit
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
     #END OF THIRD PRIORITY #############################################
-    
-    
-    
+
+
+
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
-		
+        
     if (len(moves) != 0):
-      	move = random.choice(moves) #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
+        move = random.choice(moves) #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
     else:
-      	move = "up" # games already over
+        move = "up" # games already over
         
     response = {"move": move, "shout": shout}
     return HTTPResponse(
