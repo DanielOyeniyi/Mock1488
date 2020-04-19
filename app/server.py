@@ -102,10 +102,10 @@ def value(data):
     down_val = 0
     up_val = 0
     
-    right_val = value_helper(data, snakes, 0, right_block)
-    left_val = value_helper(data, snakes, 0, left_block)
-    down_val = value_helper(data, snakes, 0, down_block)
-    up_val = value_helper(data, snakes, 0, up_block)
+    # right_val = value_helper(data, snakes, data["you"]["body"], 0, right_block)
+    left_val = value_helper(data, snakes, data["you"]["body"], 0, left_block)
+    # down_val = value_helper(data, snakes, data["you"]["body"], 0, down_block)
+    # up_val = value_helper(data, snakes, data["you"]["body"], 0, up_block)
     
     print(right_val)
     print(left_val)
@@ -130,7 +130,7 @@ def value(data):
 # for enemy snake moves we can call this but 
 # add a bool that determins if numberes will be added or
 # subtracted
-def value_helper(data, snakes, depth, block):
+def value_helper(data, snakes, body, depth, block):
     global num_loops 
     if (depth == 8 or not is_available(data, snakes, block)):
         return 0
@@ -138,7 +138,14 @@ def value_helper(data, snakes, depth, block):
         num_loops += 1
         # currently it does not act differently around tails
         tmp_snakes = snakes.copy()
-        tmp_snakes.append(block)
+        tmp_snakes.insert(0, block)
+        
+        tmp_body = body.copy()
+        tmp_body.insert(0, block)
+        tail = tmp_body.pop()
+        
+        tmp_snakes.remove(tail)
+        
         
         right_block = {"x": block["x"] + 1, "y": block["y"]}
         left_block = {"x": block["x"] - 1, "y": block["y"]}
@@ -157,11 +164,11 @@ def value_helper(data, snakes, depth, block):
         
         
         # currently the tmp_snakes just adds the last block
-        # it doesn't remove the tail block 
-        right_val = value_helper(data, tmp_snakes, depth+1, right_block)
-        left_val = value_helper(data, tmp_snakes, depth+1, left_block)
-        down_val = value_helper(data, tmp_snakes, depth+1, down_block)
-        up_val = value_helper(data, tmp_snakes, depth+1, up_block)
+        # it doesn't remove the tail block. or just past blocks
+        right_val = value_helper(data, tmp_snakes, tmp_body, depth+1, right_block)
+        left_val = value_helper(data, tmp_snakes, tmp_body, depth+1, left_block)
+        down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block)
+        up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block)
             
             
         # if (right_block in data["board"]["food"]):
