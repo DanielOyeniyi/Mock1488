@@ -145,16 +145,16 @@ def move():
 
     # if(condition1 and condition2 and condition3)
 
-    if (right2 in data["you"]["body"]) and (right1up1 in data["you"]["body"]) and (right1down1 in data["you"]["body"]):  #checks to see if body part is 2 right AND 1right 1up AND 1right 1down, to the head.
+    if ("right" in moves and right2 in data["you"]["body"]) and (right1up1 in data["you"]["body"]) and (right1down1 in data["you"]["body"]):  #checks to see if body part is 2 right AND 1right 1up AND 1right 1down, to the head.
         moves.remove("right")
       
-    if (left2 in data["you"]["body"]) and (left1up1 in data["you"]["body"]) and (left1down1 in data["you"]["body"]):  #checks to see if body part is 2 left AND 1left 1up AND 1left 1down, to the head.
+    if ("left" in moves and left2 in data["you"]["body"]) and (left1up1 in data["you"]["body"]) and (left1down1 in data["you"]["body"]):  #checks to see if body part is 2 left AND 1left 1up AND 1left 1down, to the head.
         moves.remove("left")
         
-    if (up2 in data["you"]["body"]) and (up1right1 in data["you"]["body"]) and (up1left1 in data["you"]["body"]):  #checks to see if body part is 2 up AND 1left 1up AND 1right 1up, to the head.
+    if ("up" in moves and up2 in data["you"]["body"]) and (up1right1 in data["you"]["body"]) and (up1left1 in data["you"]["body"]):  #checks to see if body part is 2 up AND 1left 1up AND 1right 1up, to the head.
         moves.remove("up") 
         
-    if (down2 in data ["you"]["body"] and down1right1 in data["you"]["body"] and down1left1 in data["you"]["body"]): #checks to see if body part is 2 down AND 1left 1down AND 1right 1down, to the head.
+    if ("down" in moves and down2 in data ["you"]["body"] and down1right1 in data["you"]["body"] and down1left1 in data["you"]["body"]): #checks to see if body part is 2 down AND 1left 1down AND 1right 1down, to the head.
         moves.remove("down")
       
     '''
