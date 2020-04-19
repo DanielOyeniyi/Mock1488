@@ -1,4 +1,4 @@
-import json
+ import json
 import os
 import random
 
@@ -164,19 +164,19 @@ def value_helper(data, snakes, depth, block):
         up_val = value_helper(data, tmp_snakes, depth+1, up_block)
             
             
-        if (right_block in data["board"]["food"]):
-            right_val += 1
-        if (left_block in data["board"]["food"]):
-            left_val += 1
-        if (down_block in data["board"]["food"]):
-            down_val += 1
-        if (up_block in data["board"]["food"]):
-            up_val += 1
+        # if (right_block in data["board"]["food"]):
+            # right_val += 1
+        # if (left_block in data["board"]["food"]):
+            # left_val += 1
+        # if (down_block in data["board"]["food"]):
+            # down_val += 1
+        # if (up_block in data["board"]["food"]):
+            # up_val += 1
             
         max_val = max(right_val, left_val, down_val, up_val)
             
-        if (block in data["board"]["food"] and depth == 0):
-            max_val += 1
+        # if (block in data["board"]["food"] and depth == 0):
+            # max_val += 1
             
         return max_val + 1
 
