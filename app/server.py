@@ -58,13 +58,13 @@ def move():
     halfHeight = heightBoard / 2
     halfWidth = widthBoard / 2
 
-    centerBlock = {		#location of center of board
-      "centerB":
-        {
-          "x": halfWidth,
-          "y": halfHeight
-        }  
-    }
+    # centerBlock = {		#location of center of board
+      # "centerB":
+        # {
+          # "x": halfWidth,
+          # "y": halfHeight
+        # }  
+    # }
 
           # LOCATION: of snake head
     locHeadX = data["you"]["body"][0]["x"]
@@ -81,7 +81,6 @@ def move():
             move = "left"
 
     if (locHeadX == 0):  #closest x-axis length
-
         neck1X = data["you"]["body"][1]["x"]
         if(neck1X ==(1)):
           move = "up"
@@ -110,7 +109,7 @@ def move():
     
 		#SECOND PRIORITY - Snake should avoid hitting itself
 
-   #Checks 1 block to the right,left,up,down to see if any of the snake's body part is in there (using the snake head location + or - 1 as a reference), if it is then it will remove the direction from the moves list.
+    #Checks 1 block to the right,left,up,down to see if any of the snake's body part is in there (using the snake head location + or - 1 as a reference), if it is then it will remove the direction from the moves list.
 	
   	right = {"x": locHeadX + 1, "y": locHeadY}
     left = {"x": locHeadX - 1, "y": locHeadY} 
