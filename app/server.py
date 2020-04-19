@@ -69,7 +69,7 @@ num_loops = 0
 # we take into account the possible moves of other snakes
 def next_move(data):
     global num_loops
-    return value(data)
+    return to_tail(data, value(data))
 
 """
 we could do that check every available spot with the next 6 moves
@@ -134,7 +134,8 @@ def value(data):
         directions.append("down")
     if (max_val == up_val):
         directions.append("up")
-    return random.choice(directions)
+    # return random.choice(directions)
+    return directions
 
 
 # for enemy snake moves we can call this but 
@@ -182,26 +183,9 @@ def value_helper(data, snakes, body, depth, block):
         down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block) + num_free(data, down_block)
         up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block) + num_free(data, up_block)
             
-            
-        # if (right_block in data["board"]["food"]):
-            # right_val += 1
-        # if (left_block in data["board"]["food"]):
-            # left_val += 1
-        # if (down_block in data["board"]["food"]):
-            # down_val += 1
-        # if (up_block in data["board"]["food"]):
-            # up_val += 1
-            
         max_val = max(right_val, left_val, down_val, up_val)
             
-        # if (block in data["board"]["food"] and depth == 0):
-            # max_val += 1
-            
         return max_val + 1
-
-
-
-
 
 # dict, dict -> int
 # checks all the free blocks conected to the input block
@@ -226,6 +210,26 @@ def num_free_helper(data, snakes, checked, block):
                 num_free_helper(data, snakes, checked, left_block) +
                 num_free_helper(data, snakes, checked, down_block) +
                 num_free_helper(data, snakes, checked, up_block) + 1)   
+
+# dict, list -> directions
+def to_tail(data, directions):
+    tail = data["you"]["body"][-1]
+    head = data["you"]["body"][0]
+    new_directions = []
+    
+    if (tail["x"] > head["x"] and "right" in directions):
+        new_directions.append("right")
+    if (tail["x"] < head["y"] and "left" in directions):
+        new_directions.append("left")
+    if (tail["y"] > head["y"] and "down" in directions):
+        new_directions.append("down")
+    if (tail["y"] < head["y"] and "up" in directions):
+        new_directions.append("up")
+        
+    if (len(new_directions) != 0):
+        return random.choice(new_directions)
+    else: 
+        return random.choice(directions)
 
 
 # dict, dict -> bool
