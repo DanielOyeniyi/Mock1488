@@ -69,7 +69,11 @@ num_loops = 0
 # we take into account the possible moves of other snakes
 def next_move(data):
     global num_loops
-    return to_tail(data, value(data))
+    if (data["you"]["health"] >= 50):
+        return to_target(data, value(data), data["you"]["body"][-1])
+    else:
+        food = closest_food(data)
+        return to_target(data, value(data), food)
 
 """
 we could do that check every available spot with the next 6 moves
@@ -136,7 +140,6 @@ def value(data):
         directions.append("up")
     # return random.choice(directions)
     return directions
-
 
 # for enemy snake moves we can call this but 
 # add a bool that determins if numberes will be added or
@@ -212,18 +215,17 @@ def num_free_helper(data, snakes, checked, block):
                 num_free_helper(data, snakes, checked, up_block) + 1)   
 
 # dict, list -> directions
-def to_tail(data, directions):
-    tail = data["you"]["body"][-1]
+def to_target(data, directions, target):
     head = data["you"]["body"][0]
     new_directions = []
     
-    if (tail["x"] > head["x"] and "right" in directions):
+    if (target["x"] > head["x"] and "right" in directions):
         new_directions.append("right")
-    if (tail["x"] < head["y"] and "left" in directions):
+    if (target["x"] < head["y"] and "left" in directions):
         new_directions.append("left")
-    if (tail["y"] > head["y"] and "down" in directions):
+    if (target["y"] > head["y"] and "down" in directions):
         new_directions.append("down")
-    if (tail["y"] < head["y"] and "up" in directions):
+    if (target["y"] < head["y"] and "up" in directions):
         new_directions.append("up")
         
     if (len(new_directions) != 0):
@@ -231,6 +233,19 @@ def to_tail(data, directions):
     else: 
         return random.choice(directions)
 
+# dict -> dict
+# returns the closest food item
+def closest_food(data):
+    closest = {}
+    max = 100
+    for food in data["board"]["food"]:
+        x = abs(data["you"]["body"][0]["x"] - food["x"])
+        y = abs(data["you"]["body"][0]["y"] - food["y"])
+        distance = x + y
+        if (disance <= max):
+            max = distance
+            closest = food
+    return closest
 
 # dict, dict -> bool
 # takes game board and a dict with x,y coordinates 
@@ -245,7 +260,6 @@ def is_free(data, snakes, pos):
     if (pos["y"] == -1 or pos["y"] == data["board"]["width"]):
         return False
     return True
-
 
 #dict -> list
 # returns a list of dicts representing snake locations
@@ -264,7 +278,6 @@ def end():
     data = bottle.request.json
     print("END:", json.dumps(data))
     return HTTPResponse(status=200)
-
 
 def main():
     bottle.run(
