@@ -233,11 +233,11 @@ def avoid_target(data, directions, target):
     
     if (abs(target["x"] - head["x"]) <= 2 and "left" in directions):
         new_directions.append("left")
-    if (abs(target["x"] < head["y"]) <= 2 and "right" in directions):
+    if (abs(target["x"] - head["y"]) <= 2 and "right" in directions):
         new_directions.append("right")
-    if (abs(target["y"] > head["y"]) <= 2 and "up" in directions):
+    if (abs(target["y"] - head["y"]) <= 2 and "up" in directions):
         new_directions.append("up")
-    if (abs(target["y"] < head["y"]) <= 2 and "down" in directions):
+    if (abs(target["y"] - head["y"]) <= 2 and "down" in directions):
         new_directions.append("down")
         
     if (len(new_directions) != 0):
