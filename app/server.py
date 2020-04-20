@@ -69,11 +69,13 @@ num_loops = 0
 # we take into account the possible moves of other snakes
 def next_move(data):
     global num_loops
-    #if (data["you"]["health"] >= 50):
-    #   return to_target(data, value(data), data["you"]["body"][-1])
-    #else:
-    food = closest_food(data)
-    return to_target(data, value(data), food)
+    enemy = closest_head(data)
+    if (enemy != {}):
+        if (is_smaller(data, enemy)):
+            return to_target(data, value(data), enemy)
+        else:
+            return avoid_target(data, value(data), enemy)
+    return to_target(data, value(data), closest_food(data))
 
 """
 we could do that check every available spot with the next 6 moves
@@ -214,7 +216,7 @@ def num_free_helper(data, snakes, checked, block):
                 num_free_helper(data, snakes, checked, down_block) +
                 num_free_helper(data, snakes, checked, up_block) + 1)   
 
-# dict, list -> directions
+# dict, list, dict -> directions
 def to_target(data, directions, target):
     head = data["you"]["body"][0]
     new_directions = []
@@ -233,6 +235,39 @@ def to_target(data, directions, target):
     else: 
         return random.choice(directions)
 
+# dict, list, dict -> directions
+def avoid_target(data, directions, target):
+    head = data["you"]["body"][0]
+    new_directions = []
+    
+    if (abs(target["x"] - head["x"]) <= 2 and "left" in directions):
+        new_directions.append("left")
+    if (abs(target["x"] < head["y"]) <= 2 and "right" in directions):
+        new_directions.append("right")
+    if (abs(target["y"] > head["y"]) <= 2 and "up" in directions):
+        new_directions.append("up")
+    if (abs(target["y"] < head["y"]) <= 2 and "down" in directions):
+        new_directions.append("down")
+        
+    if (len(new_directions) != 0):
+        return random.choice(new_directions)
+    else: 
+        return random.choice(directions)
+
+# dict -> dict
+# returns closest food item
+def closest_head(data):
+    closest = {}
+    max = 100
+    for snake in data["board"]["snakes"]:
+        x = abs(data["you"]["body"][0]["x"] - snake["body"][0]["x"])
+        y = abs(data["you"]["body"][0]["y"] - snake["body"][0]["y"])
+        distance  = x + y
+        if (data["you"]["body"][0] != snake["body"][0] and distance <= max):
+            max = distance
+            closest = snake[0]
+    return closest
+
 # dict -> dict
 # returns the closest food item
 def closest_food(data):
@@ -246,6 +281,17 @@ def closest_food(data):
             max = distance
             closest = food
     return closest
+
+# dict, dict -> dict
+# returns true if enemy snake is smalles
+# returns false otherwhise
+def is_smaller(data, enemy):
+    for snakes in data["board"]["snakes"]:
+        for snake in snakes:
+            if (enemy in snake):
+                if (len(data["you"]["body"][0]) > len(snake)):
+                    return True
+    return False
 
 # dict, dict -> bool
 # takes game board and a dict with x,y coordinates 
