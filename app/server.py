@@ -28,7 +28,7 @@ def start():
     data = bottle.request.json
     print("START:", json.dumps(data))
 
-    response = {"color": "#FF00FF", "headType": "sand-worm", "tailType": "sharp"}
+    response = {"color": "#FFD700", "headType": "beluga", "tailType": "curled"}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
@@ -46,268 +46,152 @@ def move():
     data = bottle.request.json
     print("MOVE:", json.dumps(data))
 
-    move = next_move(data)
-    num_loops = 0
-    
+    moves = ["right", "left", "down", "up"]
+
+    #FIRST PRIORITY - Snake should avoid hitting walls 
+    heightBoard = data["board"]["height"] #retrieve height 
+    widthBoard = data["board"]["width"]  #retrieve width 
+
+    halfHeight = heightBoard / 2
+    halfWidth = widthBoard / 2
+
+    # LOCATION: of snake head
+    locHeadX = data["you"]["body"][0]["x"]
+    locHeadY = data["you"]["body"][0]["y"]
+
+    #If statement to force snake away from boundaries/wall
+    #x boundary/walls/corners
+    if (locHeadX == widthBoard-1):  #farthest x-axis length, a length of 11 is represented by index 10  
+        moves.remove("right")
+        
+        # LOCATION: of neck1 
+       # neck1X = data["you"]["body"][1]["x"]
+       # if(neck1X ==(widthBoard-2)):   #if body is in the left column next to the farthest length value
+        #    move = "up"
+       # else:
+        #    move = "left"
+
+    if (locHeadX == 0):  #closest x-axis length
+        moves.remove("left")
+      
+     #   neck1X = data["you"]["body"][1]["x"]
+      #  if(neck1X ==(1)):
+       #   move = "up"
+        #else:
+         # move = "right"
+
+
+    #y boundary/walls/corners
+    if (locHeadY == heightBoard-1):
+        moves.remove("down")
+        
+        #neck1Y = data["you"]["body"][1]["y"]
+        #if (neck1Y == heightBoard-2):
+         #   move = "right"
+        #else:
+         #   move = "up"
+
+    if (locHeadY == 0):
+        moves.remove("up")
+      
+      #neck1Y = data["you"]["body"][1]["y"]
+      # if (neck1Y == 1):
+        #  move = "right"
+        #else:
+         # move = "down"
+
+
+    #END OF FIRST PRIORITY #############################################
+
+
+    #SECOND PRIORITY - Snake should avoid hitting itself
+
+    #Checks 1 block to the right,left,up,down to see if any of the snake's body part is in there (using the snake head location + or - 1 as a reference), if it is then it will remove the direction from the moves list.
+
+    right = {"x": locHeadX + 1, "y": locHeadY}
+    left = {"x": locHeadX - 1, "y": locHeadY} 
+    up = {"x": locHeadX, "y": locHeadY-1}
+    down = {"x": locHeadX, "y": locHeadY+1}
+
+    if (right in data["you"]["body"]):  #checks to see if body part is 1 RIGHT to the head.
+        moves.remove("right")
+        
+    if (left in data["you"]["body"]):  #checks to see if body part is 1 LEFT to the head.
+        moves.remove("left")
+          
+    if (up in data["you"]["body"]): #checks to see if body part is 1 UP to the head.
+        moves.remove("up")
+        
+    if (down in data["you"]["body"]): #checks to see if body part is 1 DOWN to the head.
+        moves.remove("down")
+      
+    # prevents snake from getting blocked: Checks to see if snake head will be blocked up by body in all options after moving 1 to right, left, up, down
+      
+    right2 = {"x": locHeadX + 2, "y": locHeadY}
+    right1up1 = {"x": locHeadX + 1, "y": locHeadY + 1}
+    right1down1 = {"x": locHeadX + 1, "y": locHeadY - 1}
+
+    left2 = {"x": locHeadX - 2, "y": locHeadY} 
+    left1up1 = {"x": locHeadX - 1, "y": locHeadY + 1}
+    left1down1 = {"x": locHeadX - 1, "y": locHeadY - 1}
+
+    up2 = {"x": locHeadX, "y": locHeadY-2}
+    up1right1 = {"x": locHeadX + 1, "y": locHeadY - 1}
+    up1left1 = {"x": locHeadX - 1, "y": locHeadY - 1}
+
+    down2 = {"x": locHeadX, "y": locHeadY+2}
+    down1right1 = {"x": locHeadX + 1, "y": locHeadY + 1}
+    down1left1 = {"x": locHeadX - 1, "y": locHeadY + 1}
+
+    # if(condition1 and condition2 and condition3)
+
+    if ("right" in moves and right2 in data["you"]["body"]) and (right1up1 in data["you"]["body"]) and (right1down1 in data["you"]["body"]):  #checks to see if body part is 2 right AND 1right 1up AND 1right 1down, to the head.
+        moves.remove("right")
+      
+    if ("left" in moves and left2 in data["you"]["body"]) and (left1up1 in data["you"]["body"]) and (left1down1 in data["you"]["body"]):  #checks to see if body part is 2 left AND 1left 1up AND 1left 1down, to the head.
+        moves.remove("left")
+        
+    if ("up" in moves and up2 in data["you"]["body"]) and (up1right1 in data["you"]["body"]) and (up1left1 in data["you"]["body"]):  #checks to see if body part is 2 up AND 1left 1up AND 1right 1up, to the head.
+        moves.remove("up") 
+        
+    if ("down" in moves and down2 in data ["you"]["body"] and down1right1 in data["you"]["body"] and down1left1 in data["you"]["body"]): #checks to see if body part is 2 down AND 1left 1down AND 1right 1down, to the head.
+        moves.remove("down")
+      
+
+    #END OF SECOND PRIORITY #############################################
+
+
+
+
+
+
+    #THIRD PRIORITY - Snake should find shortest path to fruit
+
+
+
+
+
+
+
+    #END OF THIRD PRIORITY #############################################
+
+
+
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
-
+        
+    if (len(moves) != 0):
+        move = random.choice(moves) #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
+    else:
+        move = "up" # games already over
+        
     response = {"move": move, "shout": shout}
     return HTTPResponse(
         status=200,
         headers={"Content-Type": "application/json"},
         body=json.dumps(response),
     )
-
-# we want to map out all the possible moves. recursion 
-# sounds like a great way to do it
-# first take into account all of our moves then 
-# we take into account the possible moves of other snakes
-def next_move(data):
-    enemy = closest_head(data)
-    if (enemy != {}):
-        if (is_smaller(data, enemy)):
-            return to_target(data, value(data), enemy)
-        else:
-            return avoid_target(data, value(data), enemy)
-    return to_target(data, value(data), closest_food(data))
-
-"""
-we could do that check every available spot with the next 6 moves
-but the sizing would have to change as that would take too 
-long to compute
-
-
-we need to make it remember it's last moves so that it
-does't count more than once. maybe add the block into 
-a temp list of snakes
-could make add the new move to the list of snakes
-every move you  remove the last part of your own 
-snake from the list. unless you ate food then you skip 
-it for the current turn
-
-we could add the # of available blocks to the score for
-each entry. It might just mean that we sacrifice 
-move depth. this could be accomplished by leveraging off of
-our older code
-
-just a consideration but we can increase or decrease the depth
-depending on what percent of the board is free and how many directions
-the snake can move in
-
-it now has decent spacial awareness (as in it won't run into a dead end)
-now we just need to hone our targeting and priorities.
-"""
-
-# dict, dict -> string
-# function checks all the moves up to a certain depth
-def value(data):
-    head = data["you"]["body"][0]
-    snakes = make_snakes(data)
-    directions = []
-    
-    right_block = {"x": head["x"] + 1, "y": head["y"]}
-    left_block = {"x": head["x"] - 1, "y": head["y"]}
-    down_block = {"x": head["x"], "y": head["y"] + 1}
-    up_block = {"x": head["x"], "y": head["y"] - 1}
-    
-    right_val = 0
-    left_val = 0
-    down_val = 0
-    up_val = 0
-    
-    depth = 0
-    if (is_free(data, snakes, right_block) and is_free(data, snakes, left_block) and 
-        is_free(data, snakes, down_block) and is_free(data, snakes, up_block)):
-        depth = 1
-    
-    right_val = value_helper(data, snakes, data["you"]["body"], depth, right_block)
-    left_val = value_helper(data, snakes, data["you"]["body"], depth, left_block)
-    down_val = value_helper(data, snakes, data["you"]["body"], depth, down_block)
-    up_val = value_helper(data, snakes, data["you"]["body"], depth, up_block)
-    
-    max_val = max(right_val, left_val, down_val, up_val)
-    if (max_val == right_val):
-        directions.append("right")
-    if (max_val == left_val):
-        directions.append("left")
-    if (max_val == down_val):
-        directions.append("down")
-    if (max_val == up_val):
-        directions.append("up")
-    return directions
-
-# for enemy snake moves we can call this but 
-# add a bool that determins if numberes will be added or
-# subtracted
-# also that would multiply our runtime by x number of snakes
-# but they don't follow the same algorithm 
-# we can still sort of predict the moves 
-def value_helper(data, snakes, body, depth, block):
-    if (depth == 3 or not is_free(data, snakes, block)):
-        return 0
-    else:
-        tmp_snakes = snakes.copy()
-        tmp_snakes.insert(0, block)
-        
-        tmp_body = body.copy()
-        tmp_body.insert(0, block)
-        tail = tmp_body.pop()
-        
-        tmp_snakes.remove(tail)
-        
-        
-        right_block = {"x": block["x"] + 1, "y": block["y"]}
-        left_block = {"x": block["x"] - 1, "y": block["y"]}
-        down_block = {"x": block["x"], "y": block["y"] + 1}
-        up_block = {"x": block["x"], "y": block["y"] - 1}
-        
-        right_val = 0
-        left_val = 0
-        down_val = 0
-        up_val = 0
-        
-        
-        # think of proper score calculations, i.e if you can kill a snake
-        # then that is worth more than just surviving, food score 
-        # should be considered too
-        
-        
-        # currently the tmp_snakes just adds the last block
-        # it doesn't remove the tail block. or just past blocks
-        right_val = value_helper(data, tmp_snakes, tmp_body, depth+1, right_block) + num_free(data, right_block)
-        left_val = value_helper(data, tmp_snakes, tmp_body, depth+1, left_block) + num_free(data, left_block)
-        down_val = value_helper(data, tmp_snakes, tmp_body, depth+1, down_block) + num_free(data, down_block)
-        up_val = value_helper(data, tmp_snakes, tmp_body, depth+1, up_block) + num_free(data, up_block)
-            
-        max_val = max(right_val, left_val, down_val, up_val)
-            
-        return max_val + 1
-
-# dict, dict -> int
-# checks all the free blocks conected to the input block
-def num_free(data, block):
-    checked = []
-    snakes = make_snakes(data)
-    return num_free_helper(data, snakes, checked, block)
-    
-def num_free_helper(data, snakes, checked, block):
-    if (not is_free(data, snakes, block) or block in checked):
-        return 0
-    else: 
-        checked.append(block)
-        right_block = {"x": block["x"] + 1, "y": block["y"]}
-        left_block = {"x": block["x"] - 1, "y": block["y"]}
-        down_block = {"x": block["x"], "y": block["y"] + 1}
-        up_block = {"x": block["x"], "y": block["y"] - 1}
-        
-        return (num_free_helper(data, snakes, checked, right_block) +
-                num_free_helper(data, snakes, checked, left_block) +
-                num_free_helper(data, snakes, checked, down_block) +
-                num_free_helper(data, snakes, checked, up_block) + 1)   
-
-# dict, list, dict -> directions
-def to_target(data, directions, target):
-    head = data["you"]["body"][0]
-    new_directions = []
-    
-    if (target["x"] > head["x"] and "right" in directions):
-        new_directions.append("right")
-    if (target["x"] < head["y"] and "left" in directions):
-        new_directions.append("left")
-    if (target["y"] > head["y"] and "down" in directions):
-        new_directions.append("down")
-    if (target["y"] < head["y"] and "up" in directions):
-        new_directions.append("up")
-        
-    if (len(new_directions) != 0):
-        return random.choice(new_directions)
-    else: 
-        return random.choice(directions)
-
-# dict, list, dict -> directions
-def avoid_target(data, directions, target):
-    head = data["you"]["body"][0]
-    new_directions = []
-    
-    if (target["x"] > head["x"] and abs(target["x"] - head["x"]) <= 2 and "left" in directions):
-        new_directions.append("left")
-    if (target["x"] < head["x"] and abs(target["x"] - head["x"]) <= 2 and "right" in directions):
-        new_directions.append("right")
-    if (target["y"] > head["y"] and abs(target["y"] - head["y"]) <= 2 and "up" in directions):
-        new_directions.append("up")
-    if (target["y"] < head["y"] and abs(target["y"] - head["y"]) <= 2 and "down" in directions):
-        new_directions.append("down")
-        
-    if (len(new_directions) != 0):
-        return random.choice(new_directions)
-    else: 
-        return random.choice(directions)
-
-# dict -> dict
-# returns closest food item
-def closest_head(data):
-    closest = {}
-    max = 100
-    for snake in data["board"]["snakes"]:
-        x = abs(data["you"]["body"][0]["x"] - snake["body"][0]["x"])
-        y = abs(data["you"]["body"][0]["y"] - snake["body"][0]["y"])
-        distance  = x + y
-        if (data["you"]["body"][0] != snake["body"][0] and distance <= max):
-            max = distance
-            closest = snake["body"][0]
-    if (max <= 4):
-        return closest
-    else:
-        return {}
-
-# dict -> dict
-# returns the closest food item
-def closest_food(data):
-    closest = {}
-    max = 100
-    for food in data["board"]["food"]:
-        x = abs(data["you"]["body"][0]["x"] - food["x"])
-        y = abs(data["you"]["body"][0]["y"] - food["y"])
-        distance = x + y
-        if (distance <= max):
-            max = distance
-            closest = food
-    return closest
-
-# dict, dict -> dict
-# returns true if enemy snake is smalles
-# returns false otherwhise
-def is_smaller(data, enemy):
-    for snake in data["board"]["snakes"]:
-        if (enemy in snake["body"]):
-            if (len(data["you"]["body"][0]) > len(snake)):
-                return True
-    return False
-
-# dict, dict -> bool
-# takes game board and a dict with x,y coordinates 
-# then returns a bool corresponding to the coordinates 
-# location on the board. i.e. false if pos is in snakes 
-# or a wall, false otherwise
-def is_free(data, snakes, pos):
-    if (pos in snakes):
-        return False
-    if (pos["x"] == -1 or pos["x"] == data["board"]["width"]):
-        return False
-    if (pos["y"] == -1 or pos["y"] == data["board"]["width"]):
-        return False
-    return True
-
-#dict -> list
-# returns a list of dicts representing snake locations
-def make_snakes(data):
-    snakes = []
-    for snake in data["board"]["snakes"]:
-        for part in snake["body"]:
-            snakes.append(part)
-    return snakes
     
 @bottle.post("/end")
 def end():
@@ -317,6 +201,7 @@ def end():
     data = bottle.request.json
     print("END:", json.dumps(data))
     return HTTPResponse(status=200)
+
 
 def main():
     bottle.run(
