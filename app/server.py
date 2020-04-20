@@ -60,15 +60,11 @@ def move():
         body=json.dumps(response),
     )
 
-
-num_loops = 0
-
 # we want to map out all the possible moves. recursion 
 # sounds like a great way to do it
 # first take into account all of our moves then 
 # we take into account the possible moves of other snakes
 def next_move(data):
-    global num_loops
     enemy = closest_head(data)
     if (enemy != {}):
         if (is_smaller(data, enemy)):
@@ -140,7 +136,6 @@ def value(data):
         directions.append("down")
     if (max_val == up_val):
         directions.append("up")
-    # return random.choice(directions)
     return directions
 
 # for enemy snake moves we can call this but 
@@ -150,8 +145,6 @@ def value(data):
 # but they don't follow the same algorithm 
 # we can still sort of predict the moves 
 def value_helper(data, snakes, body, depth, block):
-    global num_loops 
-    num_loops += 1
     if (depth == 3 or not is_free(data, snakes, block)):
         return 0
     else:
@@ -200,8 +193,6 @@ def num_free(data, block):
     return num_free_helper(data, snakes, checked, block)
     
 def num_free_helper(data, snakes, checked, block):
-    global num_loops
-    num_loops += 1
     if (not is_free(data, snakes, block) or block in checked):
         return 0
     else: 
@@ -286,11 +277,10 @@ def closest_food(data):
 # returns true if enemy snake is smalles
 # returns false otherwhise
 def is_smaller(data, enemy):
-    for snakes in data["board"]["snakes"]:
-        for snake in snakes:
-            if (enemy in snake):
-                if (len(data["you"]["body"][0]) > len(snake)):
-                    return True
+    for snake in data["board"]["snakes"]:
+        if (enemy in snake["body"]):
+            if (len(data["you"]["body"][0]) > len(snake)):
+                return True
     return False
 
 # dict, dict -> bool
