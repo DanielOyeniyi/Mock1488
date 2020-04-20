@@ -69,11 +69,11 @@ num_loops = 0
 # we take into account the possible moves of other snakes
 def next_move(data):
     global num_loops
-    if (data["you"]["health"] >= 50):
-        return to_target(data, value(data), data["you"]["body"][-1])
-    else:
-        food = closest_food(data)
-        return to_target(data, value(data), food)
+    #if (data["you"]["health"] >= 50):
+     #   return to_target(data, value(data), data["you"]["body"][-1])
+    #else:
+    food = closest_food(data)
+    return to_target(data, value(data), food)
 
 """
 we could do that check every available spot with the next 6 moves
