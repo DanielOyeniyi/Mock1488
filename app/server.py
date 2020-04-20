@@ -256,7 +256,7 @@ def closest_head(data):
         distance  = x + y
         if (data["you"]["body"][0] != snake["body"][0] and distance <= max):
             max = distance
-            closest = snake[0]
+            closest = snake["body"][0]
     return closest
 
 # dict -> dict
