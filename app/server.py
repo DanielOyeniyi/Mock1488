@@ -257,7 +257,10 @@ def closest_head(data):
         if (data["you"]["body"][0] != snake["body"][0] and distance <= max):
             max = distance
             closest = snake["body"][0]
-    return closest
+    if (max <= 4):
+        return closest
+    else:
+        return {}
 
 # dict -> dict
 # returns the closest food item
