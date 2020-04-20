@@ -242,7 +242,7 @@ def closest_food(data):
         x = abs(data["you"]["body"][0]["x"] - food["x"])
         y = abs(data["you"]["body"][0]["y"] - food["y"])
         distance = x + y
-        if (disance <= max):
+        if (distance <= max):
             max = distance
             closest = food
     return closest
