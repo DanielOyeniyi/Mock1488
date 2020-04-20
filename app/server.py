@@ -70,7 +70,7 @@ num_loops = 0
 def next_move(data):
     global num_loops
     #if (data["you"]["health"] >= 50):
-     #   return to_target(data, value(data), data["you"]["body"][-1])
+    #   return to_target(data, value(data), data["you"]["body"][-1])
     #else:
     food = closest_food(data)
     return to_target(data, value(data), food)
