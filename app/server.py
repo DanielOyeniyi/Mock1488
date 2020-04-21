@@ -199,16 +199,24 @@ def move():
     if (closest["x"] > head["x"]): 
         if ("right" in moves):
             move = "right"
+        else:
+          move = ""
     elif (closest["x"] < head["x"]): 
         if ("left" in moves):
             move = "left"
+        else:
+          move = ""
     else: # if x is not greater than or less than then it must be equal
         if (closest["y"] < head["y"]): 
             if ("up" in moves):
                 move = "up"
+            else:
+              move = ""
         elif(closest["y"] > head["y"]): 
             if ("down" in moves):
                 move = "down"
+            else:
+              move = ""
         
         
 
@@ -219,11 +227,11 @@ def move():
     # Shouts are messages sent to all the other snakes in the game.
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
-        
+            
+    
     if (move == ""):
         move = random.choice(moves) # Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
-    else:
-        move = "up" # games already over
+        
         
     response = {"move": move, "shout": shout}
     return HTTPResponse(
