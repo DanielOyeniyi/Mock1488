@@ -165,15 +165,54 @@ def move():
 
 
 
-    #THIRD PRIORITY - Snake should find shortest path to fruit
+    # THIRD PRIORITY - Snake should find shortest path to fruit
 
+    """
+    1. find the closest fruit 
+    2. go to the closest fruit 
 
+    """
 
+    head = data["you"]["body"][0]
+        
+        
+    min_distance = 999
+    closest = {"x": 0, "y": 0}
 
+        
+        # each food item = {"x": 9, "y": 5}
+    for food in data["board"]["food"]:
+        diffx = abs(food["x"]-head["x"])
+        diffy = abs(food["y"]-head["y"])
+        foodDistance = diffx + diffy
+        if (foodDistance < min_distance):
+            min_distance = foodDistance  # replaces the shortest distance
+            closest = food   # closest now equal; saves the x and y value of current min_distance
 
+        
+        
+    # eat_food(closest) # go towards closest food
+        
+    # snake(3,2) and food(4,5)
+    # 4>3 = right 4<3 = left 5>2 = up  5<2 = down, right/left by diffx and up/down by difffy
+        
+    if (closest["x"] > head["x"]): 
+        if ("right" in moves):
+            move = "right"
+    elif (closest["x"] < head["x"]): 
+        if ("left" in moves):
+            move = "left"
+    else: # if x is not greater than or less than then it must be equal
+        if (closest["y"] < head["y"]): 
+            if ("up" in moves):
+                move = "up"
+        elif(closest["y"] > head["y"]): 
+            if ("down" in moves):
+                move = "down"
+        
+        
 
-
-    #END OF THIRD PRIORITY #############################################
+    # END OF THIRD PRIORITY #############################################
 
 
 
@@ -181,8 +220,8 @@ def move():
     # Shouts are not displayed on the game board.
     shout = "I am a python snake!"
         
-    if (len(moves) != 0):
-        move = random.choice(moves) #Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
+    if (move == ""):
+        move = random.choice(moves) # Notmove > halfWidth to centerB x and Notmove > halfWidth to centerB y
     else:
         move = "up" # games already over
         
