@@ -108,21 +108,31 @@ def move():
 
     #Checks 1 block to the right,left,up,down to see if any of the snake's body part is in there (using the snake head location + or - 1 as a reference), if it is then it will remove the direction from the moves list.
 
+    allSnakes = []
+
+    for snakes in data["board"]["snakes"]:
+        for snakesBody in snakes["body"]:
+            allSnakes.append(snakesBody)
+
+
+
+
+
     right = {"x": locHeadX + 1, "y": locHeadY}
     left = {"x": locHeadX - 1, "y": locHeadY} 
     up = {"x": locHeadX, "y": locHeadY-1}
     down = {"x": locHeadX, "y": locHeadY+1}
 
-    if (right in data["you"]["body"]):  #checks to see if body part is 1 RIGHT to the head.
+    if (right in allSnakes):  #checks to see if body part is 1 RIGHT to the head.
         moves.remove("right")
         
-    if (left in data["you"]["body"]):  #checks to see if body part is 1 LEFT to the head.
+    if (left in allSnakes):  #checks to see if body part is 1 LEFT to the head.
         moves.remove("left")
           
-    if (up in data["you"]["body"]): #checks to see if body part is 1 UP to the head.
+    if (up in allSnakes): #checks to see if body part is 1 UP to the head.
         moves.remove("up")
         
-    if (down in data["you"]["body"]): #checks to see if body part is 1 DOWN to the head.
+    if (down in allSnakes): #checks to see if body part is 1 DOWN to the head.
         moves.remove("down")
       
     # prevents snake from getting blocked: Checks to see if snake head will be blocked up by body in all options after moving 1 to right, left, up, down
